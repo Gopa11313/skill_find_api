@@ -24,7 +24,7 @@ public class UserService {
         if (user.getEmail() != null && !user.getEmail().isEmpty() && user.getPassword() != null && !user.getPassword().isEmpty() && user.getLoginType() != null && !user.getLoginType().equals("")) {
             if (Validators.isValidEmail(user.getEmail())) {
                 User retirvedUser = userRepository.findUserByEmail(user.getEmail());
-                if (retirvedUser != null) {
+                if (retirvedUser == null) {
                     String code = UserUtils.generateRandomNumber(5);
                     String token = UserUtils.generateToken(user.getEmail() + code);
                     String ref_token = UserUtils.generateToken(token);
@@ -41,7 +41,7 @@ public class UserService {
                     } catch (Exception e) {
                         System.err.println("Error creating folder: " + e.getMessage());
                     }
-                    response.setData(null);
+                    response.setData(new String[]{savedUser.getToken(), savedUser.getRefToken(),savedUser.getLoginType().toString()});
                     response.setMessage("Successfully Created.");
                     response.setStatusCode(StatusCode.SUCCESS.getCode());
                     response.setSuccess(true);
@@ -83,7 +83,7 @@ public class UserService {
                             System.err.println("Error creating folder: " + e.getMessage());
                         }
                         response.setSuccess(true);
-                        response.setData(new String[]{retirvedUser.getToken(), retirvedUser.getRefToken()});
+                        response.setData(new String[]{retirvedUser.getToken(), retirvedUser.getRefToken(),retirvedUser.getLoginType().toString()});
                         response.setStatusCode(StatusCode.SUCCESS.getCode());
                         response.setMessage("Success");
                     } else {
@@ -131,12 +131,13 @@ public class UserService {
         String ref_token = UserUtils.generateToken(token);
         String hashedPassword = UserUtils.hashWithSalt(databasePassword, salt);
         user.setToken(token);
+        user.setEmail(email);
         user.setRefToken(ref_token);
         user.setPassword(hashedPassword);
         user.setLoginType(LoginType.GUEST);
         userRepository.insert(user);
         response.setSuccess(true);
-        response.setData(new String[]{token, ref_token});
+        response.setData(new String[]{token, ref_token,LoginType.GUEST.toString()});
         response.setStatusCode(StatusCode.SUCCESS.getCode());
         response.setMessage("Success");
         return response;
@@ -154,6 +155,15 @@ public class UserService {
                         retriveUser.setDob(user.getDob());
                         retriveUser.setPhNo(user.getPhNo());
                         retriveUser.setLocation(user.getLocation());
+                        if(user.getProfilePhoto()!=null) {
+                            String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/storage/" + retriveUser.getId() + "/", retriveUser.getId());
+                            retriveUser.setProfilePhoto(imageUrl);
+                        }
+                        userRepository.save(retriveUser);
+                        response.setMessage("Updated SuccessFully");
+                        response.setSuccess(true);
+                        response.setData(null);
+                        response.setStatusCode(StatusCode.SUCCESS.getCode());
                     } else {
                         response.setMessage("Please enter valid number.");
                         response.setSuccess(false);

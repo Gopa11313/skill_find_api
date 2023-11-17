@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/skillFind/v1/user")
 @AllArgsConstructor
 public class UserController {
     private UserService userService;

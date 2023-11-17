@@ -3,10 +3,14 @@ package com.gopal.skillfind.skill_find_api.utils;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -108,6 +112,7 @@ public class UserUtils {
 
         return password.toString();
     }
+
     public static boolean isValidPhoneNumber(String phoneNumber) {
         // Define a regular expression for a simple phone number pattern
         // This example assumes a 10-digit US phone number format
@@ -121,5 +126,28 @@ public class UserUtils {
 
         // Return true if the phone number matches the pattern, otherwise false
         return matcher.matches();
+    }
+
+    public static String convertAndSaveImage(String base64String, String path, String id) {
+        try {
+            // Decode Base64 string to byte array
+            byte[] decodedBytes = Base64.getDecoder().decode(base64String);
+
+            // Create a unique filename using ID and timestamp
+            String timestamp = String.valueOf(new Date().getTime());
+            String fileName = id + "_" + timestamp + ".png";  // Change the file extension based on your image format
+
+            // Specify the path where you want to save the image
+            String filePath = path + fileName;  // Replace with your desired path
+
+            // Save the image to the specified path
+            Files.write(Paths.get(filePath), decodedBytes);
+            System.out.println("Image saved successfully: " + fileName);
+            return filePath;
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error Creating image: " + e.getMessage());
+            return null;
+        }
     }
 }
