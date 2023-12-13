@@ -1,5 +1,6 @@
 package com.gopal.skillfind.skill_find_api.v1.service;
 
+import com.gopal.skillfind.skill_find_api.model.Log;
 import com.gopal.skillfind.skill_find_api.model.User;
 import com.gopal.skillfind.skill_find_api.repository.UserRepository;
 import com.gopal.skillfind.skill_find_api.utils.*;
@@ -12,182 +13,238 @@ import static com.gopal.skillfind.skill_find_api.utils.FolderCreation.createFold
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+
+    private LogService logService;
     private final String salt = "$2a$16$5qy3niSxBtkKQCqDPcvtWONCFy4fi4ALQTRPl18amIj8x40ERc/tq";
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, LogService logService) {
         this.userRepository = userRepository;
+        this.logService = logService;
     }
 
 
     public Response createUser(User user) {
         Response response = new Response();
-        if (user.getEmail() != null && !user.getEmail().isEmpty() && user.getPassword() != null && !user.getPassword().isEmpty() && user.getLoginType() != null && !user.getLoginType().equals("")) {
-            if (Validators.isValidEmail(user.getEmail())) {
-                User retirvedUser = userRepository.findUserByEmail(user.getEmail());
-                if (retirvedUser == null) {
-                    String code = UserUtils.generateRandomNumber(5);
-                    String token = UserUtils.generateToken(user.getEmail() + code);
-                    String ref_token = UserUtils.generateToken(token);
-                    String hashedPassword = UserUtils.hashWithSalt(user.getPassword(), salt);
-                    user.setToken(token);
-                    user.setRefToken(ref_token);
-                    user.setPassword(hashedPassword);
-                    user.setCreatedTimeStamp(DateUtils.getCurrentDate());
-                    User savedUser = userRepository.insert(user);
-                    String folderPath = "/storage/" + savedUser.getId();
-                    try {
-                        createFolder(folderPath);
-                        System.out.println("Folder created successfully.");
-                    } catch (Exception e) {
-                        System.err.println("Error creating folder: " + e.getMessage());
-                    }
-                    response.setData(new String[]{savedUser.getToken(), savedUser.getRefToken(),savedUser.getLoginType().toString()});
-                    response.setMessage("Successfully Created.");
-                    response.setStatusCode(StatusCode.SUCCESS.getCode());
-                    response.setSuccess(true);
-                } else {
-                    response.setData(null);
-                    response.setMessage("User Already Exists");
-                    response.setStatusCode(StatusCode.FORBIDDEN.getCode());
-                    response.setSuccess(false);
-                }
-            } else {
-                response.setData(null);
-                response.setMessage("Please provide valid email");
-                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
-                response.setSuccess(false);
-            }
-        } else {
-            response.setData(null);
-            response.setMessage("Please provide all the required field");
-            response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
-            response.setSuccess(false);
-        }
-        return response;
-    }
-
-    public Response Login(User user) {
-        Response response = new Response();
-        if (user.getEmail() != null && !user.getEmail().isEmpty() && user.getPassword() != null && !user.getPassword().isEmpty()) {
-            if (Validators.isValidEmail(user.getEmail())) {
-                User retirvedUser = userRepository.findUserByEmail(user.getEmail());
-                if (retirvedUser != null) {
-                    String databasePassword = retirvedUser.getPassword();
-                    String encryptPassWord = UserUtils.hashWithSalt(user.getPassword(), salt);
-                    if (encryptPassWord.equals(databasePassword)) {
-                        String folderPath = "/storage/" + retirvedUser.getId();
+        try {
+            if (user.getEmail() != null && !user.getEmail().isEmpty() && user.getPassword() != null && !user.getPassword().isEmpty() && user.getLoginType() != null && !user.getLoginType().equals("")) {
+                if (Validators.isValidEmail(user.getEmail())) {
+                    User retirvedUser = userRepository.findUserByEmail(user.getEmail());
+                    if (retirvedUser == null) {
+                        String code = UserUtils.generateRandomNumber(5);
+                        String token = UserUtils.generateToken(user.getEmail() + code);
+                        String ref_token = UserUtils.generateToken(token);
+                        String hashedPassword = UserUtils.hashWithSalt(user.getPassword(), salt);
+                        user.setToken(token);
+                        user.setRefToken(ref_token);
+                        user.setPassword(hashedPassword);
+                        user.setCreatedTimeStamp(DateUtils.getCurrentDate());
+                        User savedUser = userRepository.insert(user);
+                        String folderPath = "/storage/" + savedUser.getId();
                         try {
                             createFolder(folderPath);
                             System.out.println("Folder created successfully.");
                         } catch (Exception e) {
                             System.err.println("Error creating folder: " + e.getMessage());
                         }
-                        response.setSuccess(true);
-                        response.setData(new String[]{retirvedUser.getToken(), retirvedUser.getRefToken(),retirvedUser.getLoginType().toString()});
+                        response.setData(new String[]{savedUser.getToken(), savedUser.getRefToken(), savedUser.getLoginType().toString()});
+                        response.setMessage("Successfully Created.");
                         response.setStatusCode(StatusCode.SUCCESS.getCode());
-                        response.setMessage("Success");
+                        response.setSuccess(true);
+                    } else {
+                        response.setData(null);
+                        response.setMessage("User Already Exists");
+                        response.setStatusCode(StatusCode.FORBIDDEN.getCode());
+                        response.setSuccess(false);
+                    }
+                } else {
+                    response.setData(null);
+                    response.setMessage("Please provide valid email");
+                    response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+                    response.setSuccess(false);
+                }
+            } else {
+                response.setData(null);
+                response.setMessage("Please provide all the required field");
+                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+                response.setSuccess(false);
+            }
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/user/createUser");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+        }
+        return response;
+    }
+
+    public Response Login(User user) {
+        Response response = new Response();
+        try {
+            if (user.getEmail() != null && !user.getEmail().isEmpty() && user.getPassword() != null && !user.getPassword().isEmpty()) {
+                if (Validators.isValidEmail(user.getEmail())) {
+                    User retirvedUser = userRepository.findUserByEmail(user.getEmail());
+                    if (retirvedUser != null) {
+                        String databasePassword = retirvedUser.getPassword();
+                        String encryptPassWord = UserUtils.hashWithSalt(user.getPassword(), salt);
+                        if (encryptPassWord.equals(databasePassword)) {
+                            String folderPath = "/storage/" + retirvedUser.getId();
+                            try {
+                                createFolder(folderPath);
+                                System.out.println("Folder created successfully.");
+                            } catch (Exception e) {
+                                System.err.println("Error creating folder: " + e.getMessage());
+                            }
+                            response.setSuccess(true);
+                            response.setData(new String[]{retirvedUser.getToken(), retirvedUser.getRefToken(), retirvedUser.getLoginType().toString()});
+                            response.setStatusCode(StatusCode.SUCCESS.getCode());
+                            response.setMessage("Success");
+                        } else {
+                            response.setSuccess(false);
+                            response.setData(null);
+                            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+                            response.setMessage("Invalid credentials");
+                        }
+
                     } else {
                         response.setSuccess(false);
                         response.setData(null);
                         response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
-                        response.setMessage("Invalid credentials");
+                        response.setMessage("User doesn't exist.");
                     }
-
                 } else {
                     response.setSuccess(false);
                     response.setData(null);
-                    response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
-                    response.setMessage("User doesn't exist.");
+                    response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+                    response.setMessage("Please provide valid email.");
                 }
             } else {
-                response.setSuccess(false);
                 response.setData(null);
+                response.setMessage("Please provide all the required field");
                 response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
-                response.setMessage("Please provide valid email.");
+                response.setSuccess(false);
             }
-        } else {
-            response.setData(null);
-            response.setMessage("Please provide all the required field");
-            response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/user/login");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
             response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
         }
         return response;
     }
 
     public Response guestLogin() {
         Response response = new Response();
-        String email = "";
-        while (true) {
-            email = UserUtils.generateUniqueGuestEmail();
-            User retirvedUser = userRepository.findUserByEmail(email);
-            if (retirvedUser == null) {
-                break;
+        try {
+            String email = "";
+            while (true) {
+                email = UserUtils.generateUniqueGuestEmail();
+                User retirvedUser = userRepository.findUserByEmail(email);
+                if (retirvedUser == null) {
+                    break;
+                }
             }
+            String databasePassword = UserUtils.generateRandomPassword();
+            User user = new User();
+            String code = UserUtils.generateRandomNumber(5);
+            String token = UserUtils.generateToken(email + code);
+            String ref_token = UserUtils.generateToken(token);
+            String hashedPassword = UserUtils.hashWithSalt(databasePassword, salt);
+            user.setToken(token);
+            user.setEmail(email);
+            user.setRefToken(ref_token);
+            user.setPassword(hashedPassword);
+            user.setLoginType(LoginType.GUEST);
+            userRepository.insert(user);
+            response.setSuccess(true);
+            response.setData(new String[]{token, ref_token, LoginType.GUEST.toString()});
+            response.setStatusCode(StatusCode.SUCCESS.getCode());
+            response.setMessage("Success");
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/user/guestLogin");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
         }
-        String databasePassword = UserUtils.generateRandomPassword();
-        User user = new User();
-        String code = UserUtils.generateRandomNumber(5);
-        String token = UserUtils.generateToken(email + code);
-        String ref_token = UserUtils.generateToken(token);
-        String hashedPassword = UserUtils.hashWithSalt(databasePassword, salt);
-        user.setToken(token);
-        user.setEmail(email);
-        user.setRefToken(ref_token);
-        user.setPassword(hashedPassword);
-        user.setLoginType(LoginType.GUEST);
-        userRepository.insert(user);
-        response.setSuccess(true);
-        response.setData(new String[]{token, ref_token,LoginType.GUEST.toString()});
-        response.setStatusCode(StatusCode.SUCCESS.getCode());
-        response.setMessage("Success");
         return response;
     }
 
     public Response updatePersonalInfo(User user, String authorizationHeader) {
         Response response = new Response();
-        if (authorizationHeader != null || !authorizationHeader.isEmpty()) {
-            User retriveUser = userRepository.findUserByToken(authorizationHeader);
-            if (retriveUser != null) {
-                if (user.getName() != null &&
-                        !user.getName().isEmpty() && user.getPhNo() != null && !user.getPhNo().isEmpty()) {
-                    if (UserUtils.isValidPhoneNumber(user.getPhNo())) {
-                        retriveUser.setName(user.getName());
-                        retriveUser.setDob(user.getDob());
-                        retriveUser.setPhNo(user.getPhNo());
-                        retriveUser.setLocation(user.getLocation());
-                        if(user.getProfilePhoto()!=null) {
-                            String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/storage/" + retriveUser.getId() + "/", retriveUser.getId());
-                            retriveUser.setProfilePhoto(imageUrl);
+        try {
+            if (authorizationHeader != null || !authorizationHeader.isEmpty()) {
+                User retriveUser = userRepository.findUserByToken(authorizationHeader);
+                if (retriveUser != null) {
+                    if (user.getName() != null &&
+                            !user.getName().isEmpty() && user.getPhNo() != null && !user.getPhNo().isEmpty()) {
+                        if (UserUtils.isValidPhoneNumber(user.getPhNo())) {
+                            retriveUser.setName(user.getName());
+                            retriveUser.setDob(user.getDob());
+                            retriveUser.setPhNo(user.getPhNo());
+                            retriveUser.setLocation(user.getLocation());
+                            if (user.getProfilePhoto() != null) {
+                                String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/storage/" + retriveUser.getId() + "/", retriveUser.getId());
+                                retriveUser.setProfilePhoto(imageUrl);
+                            }
+                            userRepository.save(retriveUser);
+                            response.setMessage("Updated SuccessFully");
+                            response.setSuccess(true);
+                            response.setData(null);
+                            response.setStatusCode(StatusCode.SUCCESS.getCode());
+                        } else {
+                            response.setMessage("Please enter valid number.");
+                            response.setSuccess(false);
+                            response.setData(null);
+                            response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
                         }
-                        userRepository.save(retriveUser);
-                        response.setMessage("Updated SuccessFully");
-                        response.setSuccess(true);
-                        response.setData(null);
-                        response.setStatusCode(StatusCode.SUCCESS.getCode());
                     } else {
-                        response.setMessage("Please enter valid number.");
+                        response.setMessage("Please provide all the required data");
                         response.setSuccess(false);
                         response.setData(null);
                         response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
                     }
+
                 } else {
-                    response.setMessage("Please provide all the required data");
+                    response.setMessage("UnAuthorized User");
                     response.setSuccess(false);
                     response.setData(null);
-                    response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+                    response.setStatusCode(StatusCode.UNAUTHORIZED.getCode());
                 }
-
             } else {
-                response.setMessage("UnAuthorized User");
+                response.setMessage("Missing Token");
                 response.setSuccess(false);
                 response.setData(null);
-                response.setStatusCode(StatusCode.UNAUTHORIZED.getCode());
+                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
             }
-        } else {
-            response.setMessage("Missing Token");
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/user/guestLogin");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
             response.setSuccess(false);
             response.setData(null);
-            response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
         }
         return response;
 
