@@ -2,6 +2,8 @@ package com.gopal.skillfind.skill_find_api.v1.service;
 
 import com.gopal.skillfind.skill_find_api.model.Log;
 import com.gopal.skillfind.skill_find_api.model.User;
+import com.gopal.skillfind.skill_find_api.model.UserPreference;
+import com.gopal.skillfind.skill_find_api.repository.UserPreferenceRepository;
 import com.gopal.skillfind.skill_find_api.repository.UserRepository;
 import com.gopal.skillfind.skill_find_api.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +20,12 @@ public class UserService {
     private LogService logService;
     private final String salt = "$2a$16$5qy3niSxBtkKQCqDPcvtWONCFy4fi4ALQTRPl18amIj8x40ERc/tq";
 
-    public UserService(UserRepository userRepository, LogService logService) {
+    private UserPreferenceRepository userPreferenceRepository;
+
+    public UserService(UserRepository userRepository, LogService logService, UserPreferenceRepository userPreferenceRepository) {
         this.userRepository = userRepository;
         this.logService = logService;
+        this.userPreferenceRepository = userPreferenceRepository;
     }
 
 
@@ -40,6 +45,12 @@ public class UserService {
                         user.setPassword(hashedPassword);
                         user.setCreatedTimeStamp(DateUtils.getCurrentDate());
                         User savedUser = userRepository.insert(user);
+
+                        UserPreference userPreference = userPreferenceRepository.findUserPreferenceByUserID(savedUser.getId());
+                        Boolean askQuestion = false;
+                        if (userPreference == null) {
+                            askQuestion = true;
+                        }
                         String folderPath = "/storage/" + savedUser.getId();
                         try {
                             createFolder(folderPath);
@@ -47,7 +58,7 @@ public class UserService {
                         } catch (Exception e) {
                             System.err.println("Error creating folder: " + e.getMessage());
                         }
-                        response.setData(new String[]{savedUser.getToken(), savedUser.getRefToken(), savedUser.getLoginType().toString()});
+                        response.setData(new String[]{savedUser.getToken(), savedUser.getRefToken(), savedUser.getLoginType().toString(), askQuestion.toString()});
                         response.setMessage("Successfully Created.");
                         response.setStatusCode(StatusCode.SUCCESS.getCode());
                         response.setSuccess(true);
