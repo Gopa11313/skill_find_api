@@ -5,6 +5,7 @@ import com.gopal.skillfind.skill_find_api.utils.Response;
 import com.gopal.skillfind.skill_find_api.v1.service.ServicesService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +18,12 @@ public class ServiceController {
 
     @PostMapping("/createService")
     public Response createService(@RequestBody Service service, @RequestHeader("Authorization") String header) {
-        return servicesService.createService(service,header);
+        return servicesService.createService(service, header);
 
+    }
+
+    @PostMapping("/getServices")
+    public Response getServices(@RequestHeader("Authorization") String header) {
+        return servicesService.getServices(header);
     }
 }

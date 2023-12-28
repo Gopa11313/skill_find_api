@@ -143,11 +143,20 @@ public class UserUtils {
             // Save the image to the specified path
             Files.write(Paths.get(filePath), decodedBytes);
             System.out.println("Image saved successfully: " + fileName);
-            return filePath;
+            return removeBasePath(filePath, "/var/www/html");
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error Creating image: " + e.getMessage());
             return null;
+        }
+    }
+
+    public static String removeBasePath(String fullPath, String basePath) {
+        if (fullPath.startsWith(basePath)) {
+            return fullPath.substring(basePath.length());
+        } else {
+            // fullPath doesn't start with basePath, return it as is
+            return fullPath;
         }
     }
 }
