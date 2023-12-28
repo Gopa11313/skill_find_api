@@ -64,7 +64,7 @@ public class ServicesService {
 
             response.setMessage("internal server error");
             response.setSuccess(false);
-            response.setData(null);
+            response.setData(e.getMessage());
             response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
         }
         return response;

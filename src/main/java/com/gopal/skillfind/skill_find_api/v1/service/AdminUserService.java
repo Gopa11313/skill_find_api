@@ -76,7 +76,7 @@ public class AdminUserService {
     public Response adminLogin(AdminUsers adminUsers) {
         Response response = new Response();
         try {
-            if (adminUsers.getEmail() != null && adminUsers.getPassword() != null && adminUsers.getPermission() != null) {
+            if (adminUsers.getEmail() != null && adminUsers.getPassword() != null) {
                 AdminUsers adminUsers1 = userRepository.findAdminUsersByEmail(adminUsers.getEmail());
                 if (adminUsers1 != null) {
                     String hashedPassword = UserUtils.hashWithSalt(adminUsers.getPassword(), salt);
