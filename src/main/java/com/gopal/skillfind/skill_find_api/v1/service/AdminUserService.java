@@ -33,7 +33,7 @@ public class AdminUserService {
         try {
             if (adminUsers.getEmail() != null && adminUsers.getPassword() != null && adminUsers.getPermission() != null) {
                 AdminUsers dbAdminUser = userRepository.findAdminUsersByEmail(adminUsers.getEmail());
-                if (dbAdminUser != null) {
+                if (dbAdminUser == null) {
                     adminUsers.setTimeStamp(DateUtils.getCurrentDate());
                     String hashedPassword = UserUtils.hashWithSalt(adminUsers.getPassword(), salt);
                     String code = UserUtils.generateRandomNumber(5);
