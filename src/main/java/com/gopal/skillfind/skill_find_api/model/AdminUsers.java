@@ -17,4 +17,5 @@ public class AdminUsers {
     private String password;
     private String timeStamp;
     private String permission;
+    private String token;
 }

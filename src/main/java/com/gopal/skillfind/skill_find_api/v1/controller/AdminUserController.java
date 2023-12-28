@@ -20,6 +20,11 @@ public class AdminUserController {
 
     @PostMapping("/createAdminUser")
     private Response createAdmin(@RequestBody AdminUsers adminUsers) {
-      return  adminUserService.createAdminUser(adminUsers);
+        return adminUserService.createAdminUser(adminUsers);
+    }
+
+    @PostMapping("/adminLogin")
+    private Response adminLogin(@RequestBody AdminUsers adminUsers) {
+        return adminUserService.adminLogin(adminUsers);
     }
 }

@@ -34,11 +34,17 @@ public class SkillFindApiApplication {
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/post/createPost").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/post/editPost").permitAll()
 
-                    //admin
-                    .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/createAdminUser").permitAll()
+
 
                     //preference
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/userPref/createPref").permitAll()
+
+                    //admin
+                    .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/createAdminUser").permitAll()
+                    .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/adminLogin").permitAll()
+
+                    //services
+                    .antMatchers(HttpMethod.POST, "/api/skillFind/service/createService").permitAll()
                     .anyRequest().authenticated();
         }
     }

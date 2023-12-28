@@ -217,7 +217,7 @@ public class UserService {
                             retriveUser.setPhNo(user.getPhNo());
                             retriveUser.setLocation(user.getLocation());
                             if (user.getProfilePhoto() != null) {
-                                String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/storage/" + retriveUser.getId() + "/", retriveUser.getId());
+                                String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/var/www/html/storage/" + retriveUser.getId() + "/", retriveUser.getId());
                                 retriveUser.setProfilePhoto(imageUrl);
                             }
                             userRepository.save(retriveUser);
