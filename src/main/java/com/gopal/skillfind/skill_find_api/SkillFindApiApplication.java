@@ -36,6 +36,9 @@ public class SkillFindApiApplication {
 
                     //admin
                     .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/createAdminUser").permitAll()
+
+                    //preference
+                    .antMatchers(HttpMethod.POST, "/api/skillFind/v1/userPref/createPref").permitAll()
                     .anyRequest().authenticated();
         }
     }

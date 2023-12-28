@@ -112,8 +112,13 @@ public class UserService {
                             } catch (Exception e) {
                                 System.err.println("Error creating folder: " + e.getMessage());
                             }
+                            UserPreference userPreference = userPreferenceRepository.findUserPreferenceByUserID(retirvedUser.getId());
+                            Boolean askQuestion = false;
+                            if (userPreference == null) {
+                                askQuestion = true;
+                            }
                             response.setSuccess(true);
-                            response.setData(new String[]{retirvedUser.getToken(), retirvedUser.getRefToken(), retirvedUser.getLoginType().toString()});
+                            response.setData(new String[]{retirvedUser.getToken(), retirvedUser.getRefToken(), retirvedUser.getLoginType().toString(),askQuestion.toString()});
                             response.setStatusCode(StatusCode.SUCCESS.getCode());
                             response.setMessage("Success");
                         } else {
