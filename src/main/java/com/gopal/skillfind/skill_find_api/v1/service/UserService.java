@@ -51,7 +51,7 @@ public class UserService {
                         if (userPreference == null) {
                             askQuestion = true;
                         }
-                        String folderPath = "/storage/" + savedUser.getId();
+                        String folderPath = "/var/www/html/storage/" + savedUser.getId();
                         try {
                             createFolder(folderPath);
                             System.out.println("Folder created successfully.");
@@ -105,7 +105,7 @@ public class UserService {
                         String databasePassword = retirvedUser.getPassword();
                         String encryptPassWord = UserUtils.hashWithSalt(user.getPassword(), salt);
                         if (encryptPassWord.equals(databasePassword)) {
-                            String folderPath = "/storage/" + retirvedUser.getId();
+                            String folderPath = "/var/www/html/storage/" + retirvedUser.getId();
                             try {
                                 createFolder(folderPath);
                                 System.out.println("Folder created successfully.");
@@ -217,7 +217,7 @@ public class UserService {
                             retriveUser.setPhNo(user.getPhNo());
                             retriveUser.setLocation(user.getLocation());
                             if (user.getProfilePhoto() != null) {
-                                String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/storage/" + retriveUser.getId() + "/", retriveUser.getId());
+                                String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/var/www/html/storage/" + retriveUser.getId() + "/", retriveUser.getId());
                                 retriveUser.setProfilePhoto(imageUrl);
                             }
                             userRepository.save(retriveUser);
