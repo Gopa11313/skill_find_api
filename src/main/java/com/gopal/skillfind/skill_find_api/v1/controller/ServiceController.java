@@ -26,4 +26,8 @@ public class ServiceController {
     public Response getServices(@RequestHeader("Authorization") String header) {
         return servicesService.getServices(header);
     }
+    @PostMapping("/deleteService")
+    public Response deleteService (@RequestBody Service service,@RequestHeader("Authorization") String header) {
+    return servicesService.deleteService(service, header);
+    }
 }

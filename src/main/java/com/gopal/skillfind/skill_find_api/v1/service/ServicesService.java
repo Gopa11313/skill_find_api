@@ -43,7 +43,7 @@ public class ServicesService {
                 AdminUsers dbAdmin = adminUserRepository.findAdminUsersByToken(header);
                 if (dbAdmin != null) {
                     String imageUrl = UserUtils.convertAndSaveImage(service.getImage(), "/var/www/html/storage/" + "admin" + "/", service.getName());
-                    service.setName(imageUrl);
+                    service.setImage(imageUrl);
                     serviceRepository.save(service);
                     response.setMessage("Success");
                     response.setSuccess(true);
@@ -82,11 +82,18 @@ public class ServicesService {
             if (header != null && !header.isEmpty()) {
                 AdminUsers dbUser = adminUserRepository.findAdminUsersByToken(header);
                 if (dbUser != null) {
-                    List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = serviceRepository.findByIsActiveTrue();
-                    response.setMessage("Success");
-                    response.setSuccess(true);
-                    response.setData(serviceList);
-                    response.setStatusCode(StatusCode.SUCCESS.getCode());
+                    if (Integer.parseInt(dbUser.getPermission()) >= 2) {
+                        List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = serviceRepository.findByIsActiveTrue();
+                        response.setMessage("Success");
+                        response.setSuccess(true);
+                        response.setData(serviceList);
+                        response.setStatusCode(StatusCode.SUCCESS.getCode());
+                    } else {
+                        response.setMessage("Admin doesn't have permission");
+                        response.setSuccess(false);
+                        response.setData(null);
+                        response.setStatusCode(StatusCode.NOT_FOUND.getCode());
+                    }
                 } else {
                     response.setMessage("Login again");
                     response.setSuccess(false);
@@ -116,4 +123,58 @@ public class ServicesService {
     }
 
 
+    public Response deleteService(com.gopal.skillfind.skill_find_api.model.Service service, String header) {
+        Response response = new Response();
+        try {
+            if (header != null && !header.isEmpty()) {
+                AdminUsers dbUser = adminUserRepository.findAdminUsersByToken(header);
+                if (dbUser != null) {
+                    if (Integer.parseInt(dbUser.getPermission()) >= 2) {
+                        com.gopal.skillfind.skill_find_api.model.Service dbService = serviceRepository.findByServiceId(service.getId());
+                        if (dbService != null) {
+                            serviceRepository.delete(dbService);
+                            response.setMessage("Success");
+                            response.setSuccess(true);
+                            response.setData(null);
+                            response.setStatusCode(StatusCode.SUCCESS.getCode());
+                        } else {
+                            response.setMessage("Service not found");
+                            response.setSuccess(false);
+                            response.setData(null);
+                            response.setStatusCode(StatusCode.NOT_FOUND.getCode());
+                        }
+                    } else {
+                        response.setMessage("Admin doesn't have permission");
+                        response.setSuccess(false);
+                        response.setData(null);
+                        response.setStatusCode(StatusCode.UNAUTHORIZED.getCode());
+                    }
+                } else {
+                    response.setMessage("Login again");
+                    response.setSuccess(false);
+                    response.setData(null);
+                    response.setStatusCode(StatusCode.NOT_FOUND.getCode());
+                }
+            } else {
+                response.setMessage("Missing token");
+                response.setSuccess(false);
+                response.setData(null);
+                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+            }
+
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/adminUser/createAdminUser");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(e.getMessage());
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+        }
+        return response;
+    }
 }
+

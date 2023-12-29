@@ -9,4 +9,6 @@ import java.util.List;
 public interface ServiceRepository extends MongoRepository<Service,String> {
 
     List<Service> findByIsActiveTrue();
+
+    Service findByServiceId(String id);
 }
