@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ServicesService {
@@ -130,9 +131,9 @@ public class ServicesService {
                 AdminUsers dbUser = adminUserRepository.findAdminUsersByToken(header);
                 if (dbUser != null) {
                     if (Integer.parseInt(dbUser.getPermission()) >= 2) {
-                        com.gopal.skillfind.skill_find_api.model.Service dbService = serviceRepository.findByServiceId(service.getId());
-                        if (dbService != null) {
-                            serviceRepository.delete(dbService);
+                        Optional<com.gopal.skillfind.skill_find_api.model.Service> dbService = serviceRepository.findById(service.getId());
+                        if (dbService.isPresent()) {
+                            serviceRepository.delete(dbService.get());
                             response.setMessage("Success");
                             response.setSuccess(true);
                             response.setData(null);
