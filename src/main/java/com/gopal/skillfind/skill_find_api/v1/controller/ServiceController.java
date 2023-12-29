@@ -23,8 +23,8 @@ public class ServiceController {
     }
 
     @PostMapping("/getServices")
-    public Response getServices(@RequestHeader("Authorization") String header) {
-        return servicesService.getServices(header);
+    public Response getServices() {
+        return servicesService.getServices();
     }
     @PostMapping("/deleteService")
     public Response deleteService (@RequestBody Service service,@RequestHeader("Authorization") String header) {

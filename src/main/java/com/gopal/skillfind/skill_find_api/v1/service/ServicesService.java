@@ -77,37 +77,14 @@ public class ServicesService {
         return response;
     }
 
-    public Response getServices(String header) {
+    public Response getServices() {
         Response response = new Response();
         try {
-            if (header != null && !header.isEmpty()) {
-                AdminUsers dbUser = adminUserRepository.findAdminUsersByToken(header);
-                if (dbUser != null) {
-                    if (Integer.parseInt(dbUser.getPermission()) >= 2) {
-                        List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = serviceRepository.findByIsActiveTrue();
-                        response.setMessage("Success");
-                        response.setSuccess(true);
-                        response.setData(serviceList);
-                        response.setStatusCode(StatusCode.SUCCESS.getCode());
-                    } else {
-                        response.setMessage("Admin doesn't have permission");
-                        response.setSuccess(false);
-                        response.setData(null);
-                        response.setStatusCode(StatusCode.NOT_FOUND.getCode());
-                    }
-                } else {
-                    response.setMessage("Login again");
-                    response.setSuccess(false);
-                    response.setData(null);
-                    response.setStatusCode(StatusCode.NOT_FOUND.getCode());
-                }
-            } else {
-                response.setMessage("Missing token");
-                response.setSuccess(false);
-                response.setData(null);
-                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
-            }
-
+            List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = serviceRepository.findByIsActiveTrue();
+            response.setMessage("Success");
+            response.setSuccess(true);
+            response.setData(serviceList);
+            response.setStatusCode(StatusCode.SUCCESS.getCode());
         } catch (Exception e) {
             Log log = new Log();
             log.setError(e.getMessage());
