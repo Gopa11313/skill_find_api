@@ -80,7 +80,7 @@ public class ServicesService {
         Response response = new Response();
         try {
             if (header != null && !header.isEmpty()) {
-                User dbUser = userRepository.findUserByToken(header);
+                AdminUsers dbUser = adminUserRepository.findAdminUsersByToken(header);
                 if (dbUser != null) {
                     List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = serviceRepository.findByIsActiveTrue();
                     response.setMessage("Success");
