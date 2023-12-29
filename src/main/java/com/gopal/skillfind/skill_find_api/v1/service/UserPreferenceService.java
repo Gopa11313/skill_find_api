@@ -38,6 +38,7 @@ public class UserPreferenceService {
                     UserPreference userPreference = userPreferenceRepository.findUserPreferenceByUserID(retriveUser.getId());
                     if (userPreference == null) {
                         userPref.setId(retriveUser.getId());
+                        userPref.setTimeStamp(DateUtils.getCurrentDate());
                         userPreferenceRepository.insert(userPref);
                         response.setMessage("Successfully Created");
                         response.setSuccess(true);
