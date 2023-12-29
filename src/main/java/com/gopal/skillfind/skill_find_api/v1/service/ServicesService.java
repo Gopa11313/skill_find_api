@@ -61,8 +61,6 @@ public class ServicesService {
                 response.setData(null);
                 response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
             }
-
-//            if(service.get)
         } catch (Exception e) {
             Log log = new Log();
             log.setError(e.getMessage());
