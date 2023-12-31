@@ -35,7 +35,7 @@ public class PostService {
     public Response createPost(Post post, String authorizationHeader) {
         Response response = new Response();
         try {
-            if (authorizationHeader != null || !authorizationHeader.isEmpty()) {
+            if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
                 User retriveUser = userRepository.findUserByToken(authorizationHeader);
                 if (retriveUser != null) {
                     if (post.getImages() != null) {
@@ -54,6 +54,9 @@ public class PostService {
                         post.setPostContent(null);
 
                     }
+                    System.out.println("Gopal here");
+                    Coordinates coordinates = new Coordinates();
+                    System.out.println(post.getCoordinates().latitude + " , " + post.getCoordinates().longitude);
                     post.setUserId(retriveUser.getId());
                     post.setCreatedDate(DateUtils.getCurrentDate());
                     postRepository.save(post);
@@ -91,7 +94,7 @@ public class PostService {
     public Response editPost(Post post, String authorizationHeader) {
         Response response = new Response();
         try {
-            if (authorizationHeader != null || !authorizationHeader.isEmpty()) {
+            if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
                 User retriveUser = userRepository.findUserByToken(authorizationHeader);
                 if (retriveUser != null) {
                     System.out.println(post.getId() + "," + retriveUser.getId());
@@ -151,7 +154,7 @@ public class PostService {
     public Response getPost(Post post) {
         Response response = new Response();
         try {
-            if (post.getType() != null || !post.getType().equals("")) {
+            if (post.getType() != null && !post.getType().equals("")) {
                 System.out.println("Post type :" + post.getType().toString());
                 List<Post> postList = postRepository.findAllByType(post.getType().toString(), Sort.by(Sort.Order.desc("createdDate")));
                 System.out.println("List of Post size :" + postList.size());
@@ -161,6 +164,52 @@ public class PostService {
                 response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
             } else {
                 response.setMessage("Missing type");
+                response.setSuccess(false);
+                response.setData(null);
+                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+            }
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/post/editPost");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+        }
+        return response;
+    }
+
+    public Response deletePost(Post post, String authorizationHeader) {
+        Response response = new Response();
+        try {
+            if (authorizationHeader != null && !authorizationHeader.isEmpty() && post.getId() != null && !post.getId().isEmpty()) {
+                User retriveUser = userRepository.findUserByToken(authorizationHeader);
+                if (retriveUser != null) {
+                    Post dbPost = postRepository.findPostByIdAndUserId(post.getId(), retriveUser.getId());
+                    if (dbPost != null) {
+                        postRepository.delete(dbPost);
+                        response.setMessage("Deleted Successfully!");
+                        response.setSuccess(true);
+                        response.setData(null);
+                        response.setStatusCode(StatusCode.SUCCESS.getCode());
+                    } else {
+                        response.setMessage("Post not found.");
+                        response.setSuccess(false);
+                        response.setData(null);
+                        response.setStatusCode(StatusCode.NOT_FOUND.getCode());
+                    }
+                } else {
+                    response.setMessage("Please login again");
+                    response.setSuccess(false);
+                    response.setData(null);
+                    response.setStatusCode(StatusCode.UNAUTHORIZED.getCode());
+                }
+            } else {
+                response.setMessage("Please provide all the required field.");
                 response.setSuccess(false);
                 response.setData(null);
                 response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
