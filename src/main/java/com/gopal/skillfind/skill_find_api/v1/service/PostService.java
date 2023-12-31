@@ -7,6 +7,7 @@ import com.gopal.skillfind.skill_find_api.repository.PostRepository;
 import com.gopal.skillfind.skill_find_api.repository.UserRepository;
 import com.gopal.skillfind.skill_find_api.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Array;
@@ -127,6 +128,39 @@ public class PostService {
                 }
             } else {
                 response.setMessage("Missing Token");
+                response.setSuccess(false);
+                response.setData(null);
+                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+            }
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/post/editPost");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+        }
+        return response;
+    }
+
+
+    public Response getPost(Post post) {
+        Response response = new Response();
+        try {
+            if (post.getType() != null || !post.getType().equals("")) {
+                System.out.println("Post type :" + post.getType().toString());
+                List<Post> postList = postRepository.findAllByType(post.getType().toString(), Sort.by(Sort.Order.desc("createdDate")));
+                System.out.println("List of Post size :" + postList.size());
+                response.setMessage("Success");
+                response.setSuccess(true);
+                response.setData(postList);
+                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+            } else {
+                response.setMessage("Missing type");
                 response.setSuccess(false);
                 response.setData(null);
                 response.setStatusCode(StatusCode.BAD_REQUEST.getCode());

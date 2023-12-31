@@ -16,11 +16,17 @@ public class PostController {
     private PostService postService;
 
     @PostMapping("/createPost")
-    private Response createPost(@RequestBody Post post, @RequestHeader("Authorization") String authorizationHeader){
-        return postService.createPost(post,authorizationHeader);
+    private Response createPost(@RequestBody Post post, @RequestHeader("Authorization") String authorizationHeader) {
+        return postService.createPost(post, authorizationHeader);
     }
+
     @PostMapping("/editPost")
-    private Response editPost(@RequestBody Post post, @RequestHeader("Authorization") String authorizationHeader){
-        return postService.editPost(post,authorizationHeader);
+    private Response editPost(@RequestBody Post post, @RequestHeader("Authorization") String authorizationHeader) {
+        return postService.editPost(post, authorizationHeader);
+    }
+
+    @PostMapping("/getPost")
+    private Response getPosts(@RequestBody Post post) {
+        return postService.getPost(post);
     }
 }
