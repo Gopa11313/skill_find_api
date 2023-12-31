@@ -155,9 +155,7 @@ public class PostService {
         Response response = new Response();
         try {
             if (post.getType() != null && !post.getType().equals("")) {
-                System.out.println("Post type :" + post.getType().toString());
                 List<Post> postList = postRepository.findAllByType(post.getType().toString(), Sort.by(Sort.Order.desc("createdDate")));
-                System.out.println("List of Post size :" + postList.size());
                 response.setMessage("Success");
                 response.setSuccess(true);
                 response.setData(postList);
