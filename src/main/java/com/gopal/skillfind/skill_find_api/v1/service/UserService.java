@@ -265,7 +265,7 @@ public class UserService {
         } catch (Exception e) {
             Log log = new Log();
             log.setError(e.getMessage());
-            log.setSource("/api/skillFind/v1/user/guestLogin");
+            log.setSource("/api/skillFind/v1/user/updatePersonalInfo");
             log.setTimeStamp(DateUtils.getCurrentDate());
             logService.createLog(log);
 
@@ -308,7 +308,7 @@ public class UserService {
         } catch (Exception e) {
             Log log = new Log();
             log.setError(e.getMessage());
-            log.setSource("/api/skillFind/v1/user/guestLogin");
+            log.setSource("/api/skillFind/v1/user/getUserInfo");
             log.setTimeStamp(DateUtils.getCurrentDate());
             logService.createLog(log);
 
