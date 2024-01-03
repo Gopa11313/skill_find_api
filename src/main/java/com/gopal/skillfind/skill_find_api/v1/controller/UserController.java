@@ -26,8 +26,14 @@ public class UserController {
     private Response GuestLogin() {
         return userService.guestLogin();
     }
+
     @PostMapping("/updatePersonalInfo")
-    private Response UpdatePersonalInfo(@RequestBody User user,@RequestHeader("Authorization") String authorizationHeader){
-        return userService.updatePersonalInfo(user,authorizationHeader);
+    private Response UpdatePersonalInfo(@RequestBody User user, @RequestHeader("Authorization") String authorizationHeader) {
+        return userService.updatePersonalInfo(user, authorizationHeader);
+    }
+
+    @PostMapping("/getUserInfo")
+    private Response getUserInfo(@RequestHeader("Authorization") String authorizationHeader) {
+        return userService.getUserInfo(authorizationHeader);
     }
 }

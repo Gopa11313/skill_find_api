@@ -9,6 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.lang.reflect.Array;
+import java.util.List;
 
 @Data
 @Document
@@ -27,10 +28,10 @@ public class User {
     private LoginType loginType;
     private String token;
     private String refToken;
-    private String[] skills;
+    private List<String> skills;
     private String profilePhoto;
     private String dob;
-    private String[] workImages;
+    private List<String> workImages;
     private String startedWorkingYear;
     private String workPreference;
     private String createdTimeStamp;

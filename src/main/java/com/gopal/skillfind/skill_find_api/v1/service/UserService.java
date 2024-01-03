@@ -9,6 +9,9 @@ import com.gopal.skillfind.skill_find_api.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.gopal.skillfind.skill_find_api.utils.FolderCreation.createFolder;
 
 @Service
@@ -118,7 +121,7 @@ public class UserService {
                                 askQuestion = true;
                             }
                             response.setSuccess(true);
-                            response.setData(new String[]{retirvedUser.getToken(), retirvedUser.getRefToken(), retirvedUser.getLoginType().toString(),askQuestion.toString()});
+                            response.setData(new String[]{retirvedUser.getToken(), retirvedUser.getRefToken(), retirvedUser.getLoginType().toString(), askQuestion.toString()});
                             response.setStatusCode(StatusCode.SUCCESS.getCode());
                             response.setMessage("Success");
                         } else {
@@ -211,26 +214,35 @@ public class UserService {
                 if (retriveUser != null) {
                     if (user.getName() != null &&
                             !user.getName().isEmpty() && user.getPhNo() != null && !user.getPhNo().isEmpty()) {
-                        if (UserUtils.isValidPhoneNumber(user.getPhNo())) {
+//                        if (UserUtils.isValidPhoneNumber(user.getPhNo())) {
                             retriveUser.setName(user.getName());
                             retriveUser.setDob(user.getDob());
                             retriveUser.setPhNo(user.getPhNo());
                             retriveUser.setLocation(user.getLocation());
+                            retriveUser.setBio(user.getBio());
                             if (user.getProfilePhoto() != null) {
                                 String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/var/www/html/storage/" + retriveUser.getId() + "/", retriveUser.getId());
                                 retriveUser.setProfilePhoto(imageUrl);
+                            }
+                            if (user.getWorkImages().size() > 0) {
+                                List<String> savedImages = new ArrayList<>();
+                                for (int i = 0; i < user.getWorkImages().size(); i++) {
+                                    String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/var/www/html/storage/" + retriveUser.getId() + "/", retriveUser.getId());
+                                    savedImages.add(imageUrl);
+                                }
+                                retriveUser.setWorkImages(savedImages);
                             }
                             userRepository.save(retriveUser);
                             response.setMessage("Updated SuccessFully");
                             response.setSuccess(true);
                             response.setData(null);
                             response.setStatusCode(StatusCode.SUCCESS.getCode());
-                        } else {
-                            response.setMessage("Please enter valid number.");
-                            response.setSuccess(false);
-                            response.setData(null);
-                            response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
-                        }
+//                        } else {
+//                            response.setMessage("Please enter valid number.");
+//                            response.setSuccess(false);
+//                            response.setData(null);
+//                            response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+//                        }
                     } else {
                         response.setMessage("Please provide all the required data");
                         response.setSuccess(false);
@@ -264,5 +276,47 @@ public class UserService {
         }
         return response;
 
+    }
+
+    public Response getUserInfo(String authorizationHeader) {
+        Response response = new Response();
+        try {
+            if (authorizationHeader != null || !authorizationHeader.isEmpty()) {
+                User retriveUser = userRepository.findUserByToken(authorizationHeader);
+                if (retriveUser != null) {
+                    retriveUser.setId("");
+                    retriveUser.setToken("");
+                    retriveUser.setRefToken("");
+                    retriveUser.setPassword("");
+                    retriveUser.setCreatedTimeStamp("");
+                    response.setMessage("Data");
+                    response.setSuccess(true);
+                    response.setData(retriveUser);
+                    response.setStatusCode(StatusCode.SUCCESS.getCode());
+                } else {
+                    response.setMessage("UnAuthorized User");
+                    response.setSuccess(false);
+                    response.setData(null);
+                    response.setStatusCode(StatusCode.UNAUTHORIZED.getCode());
+                }
+            } else {
+                response.setMessage("Missing Token");
+                response.setSuccess(false);
+                response.setData(null);
+                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+            }
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/user/guestLogin");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+        }
+        return response;
     }
 }
