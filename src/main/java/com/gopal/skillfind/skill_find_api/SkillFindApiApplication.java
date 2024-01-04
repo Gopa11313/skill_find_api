@@ -31,6 +31,7 @@ public class SkillFindApiApplication {
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/user/guestLogin").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/user/updatePersonalInfo").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/user/getUserInfo").permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/skillFind/v1/user/getFeaturedProfile/{for}").permitAll()
                     //post
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/post/createPost").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/post/editPost").permitAll()
