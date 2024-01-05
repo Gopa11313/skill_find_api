@@ -234,7 +234,7 @@ public class UserService {
                         if (user.getWorkImages().size() > 0) {
                             List<String> savedImages = new ArrayList<>();
                             for (int i = 0; i < user.getWorkImages().size(); i++) {
-                                String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/var/www/html/storage/" + retriveUser.getId() + "/", retriveUser.getId());
+                                String imageUrl = UserUtils.convertAndSaveImage(user.getWorkImages().get(i), "/var/www/html/storage/" + retriveUser.getId() + "/", retriveUser.getId());
                                 savedImages.add(imageUrl);
                             }
                             retriveUser.setWorkImages(savedImages);
