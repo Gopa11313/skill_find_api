@@ -52,11 +52,10 @@ public class PostService {
                     }
                     if (post.getType() == PostType.JOB) {
                         post.setPostContent(null);
-
                     }
-                    System.out.println("Gopal here");
-                    Coordinates coordinates = new Coordinates();
-                    System.out.println(post.getCoordinates().latitude + " , " + post.getCoordinates().longitude);
+
+//                    Coordinates coordinates = new Coordinates();
+//                    System.out.println(post.getCoordinates().latitude + " , " + post.getCoordinates().longitude);
                     post.setUserId(retriveUser.getId());
                     post.setCreatedDate(DateUtils.getCurrentDate());
                     postRepository.save(post);
