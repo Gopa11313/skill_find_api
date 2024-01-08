@@ -383,21 +383,19 @@ public class UserService {
         try {
             if (authorizationHeader != null || !authorizationHeader.isEmpty()) {
                 User retriveUser = userRepository.findUserByToken(authorizationHeader);
-                if (retriveUser != null && !retriveUser.getSkills().isEmpty()) {
+                if (retriveUser != null) {
                     List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = new ArrayList<>();
-                    for (String skill : retriveUser.getSkills()) {
-                        Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(skill);
-                        if (service.isPresent()) {
-                            if (service.get().getIsActive()) {
-                                serviceList.add(service.get());
-                            }
+                    if (retriveUser.getSkills() != null && retriveUser.getSkills().size() > 0) {
+                        for (String skill : retriveUser.getSkills()) {
+                            Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(skill);
+                            service.ifPresent(serviceList::add);
                         }
+
                     }
                     response.setMessage("SuccessFul");
                     response.setSuccess(true);
                     response.setData(serviceList);
                     response.setStatusCode(StatusCode.SUCCESS.getCode());
-
                 } else {
                     response.setMessage("User doesn't exists.");
                     response.setSuccess(false);
@@ -413,7 +411,7 @@ public class UserService {
         } catch (Exception e) {
             Log log = new Log();
             log.setError(e.getMessage());
-            log.setSource("/api/skillFind/v1/user/getUserInfo");
+            log.setSource("/api/skillFind/v1/user/getUserSkills");
             log.setTimeStamp(DateUtils.getCurrentDate());
             logService.createLog(log);
 
