@@ -3,6 +3,7 @@ package com.gopal.skillfind.skill_find_api.v1.service;
 import com.gopal.skillfind.skill_find_api.model.Log;
 import com.gopal.skillfind.skill_find_api.model.User;
 import com.gopal.skillfind.skill_find_api.model.UserPreference;
+import com.gopal.skillfind.skill_find_api.repository.ServiceRepository;
 import com.gopal.skillfind.skill_find_api.repository.UserPreferenceRepository;
 import com.gopal.skillfind.skill_find_api.repository.UserRepository;
 import com.gopal.skillfind.skill_find_api.utils.*;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.gopal.skillfind.skill_find_api.utils.FolderCreation.createFolder;
 
@@ -23,16 +25,20 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-
     private LogService logService;
+
+    @Autowired
+    private ServiceRepository serviceRepository;
     private final String salt = "$2a$16$5qy3niSxBtkKQCqDPcvtWONCFy4fi4ALQTRPl18amIj8x40ERc/tq";
 
     private UserPreferenceRepository userPreferenceRepository;
 
-    public UserService(UserRepository userRepository, LogService logService, UserPreferenceRepository userPreferenceRepository) {
+
+    public UserService(UserRepository userRepository, LogService logService, UserPreferenceRepository userPreferenceRepository, ServiceRepository serviceRepository) {
         this.userRepository = userRepository;
         this.logService = logService;
         this.userPreferenceRepository = userPreferenceRepository;
+        this.serviceRepository = serviceRepository;
     }
 
 
@@ -350,6 +356,53 @@ public class UserService {
                     response.setSuccess(false);
                     response.setData(null);
                     response.setStatusCode(StatusCode.UNAUTHORIZED.getCode());
+                }
+            } else {
+                response.setMessage("Missing Token");
+                response.setSuccess(false);
+                response.setData(null);
+                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+            }
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/user/getUserInfo");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+        }
+        return response;
+    }
+
+    public Response getUserSkills(String authorizationHeader) {
+        Response response = new Response();
+        try {
+            if (authorizationHeader != null || !authorizationHeader.isEmpty()) {
+                User retriveUser = userRepository.findUserByToken(authorizationHeader);
+                if (retriveUser != null && !retriveUser.getSkills().isEmpty()) {
+                    List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = new ArrayList<>();
+                    for (String skill : retriveUser.getSkills()) {
+                        Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(skill);
+                        if (service.isPresent()) {
+                            if (service.get().getIsActive()) {
+                                serviceList.add(service.get());
+                            }
+                        }
+                    }
+                    response.setMessage("SuccessFul");
+                    response.setSuccess(true);
+                    response.setData(serviceList);
+                    response.setStatusCode(StatusCode.SUCCESS.getCode());
+
+                } else {
+                    response.setMessage("User doesn't exists.");
+                    response.setSuccess(false);
+                    response.setData(null);
+                    response.setStatusCode(StatusCode.NOT_FOUND.getCode());
                 }
             } else {
                 response.setMessage("Missing Token");

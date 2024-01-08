@@ -41,4 +41,9 @@ public class UserController {
     private Response getFeaturedProfile(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("for") String context) {
         return userService.getFeaturedProfile(authorizationHeader, context);
     }
+
+    @GetMapping("/getUserSkills")
+    private Response getUSerSkills(@RequestHeader("Authorization") String authorizationHeader){
+        return userService.getUserSkills(authorizationHeader);
+    }
 }

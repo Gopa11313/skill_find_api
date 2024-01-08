@@ -13,4 +13,5 @@ public interface ServiceRepository extends MongoRepository<Service,String> {
     List<Service> findByIsActiveTrue();
 
     Optional<Service> findById(String id);
+
 }
