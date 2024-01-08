@@ -153,18 +153,17 @@ public class PostService {
     public Response getPost(Post post) {
         Response response = new Response();
         try {
-            if (post.getType() != null && !post.getType().equals("")) {
-                List<Post> postList = postRepository.findAllByType(post.getType().toString(), Sort.by(Sort.Order.desc("createdDate")));
-                response.setMessage("Success");
-                response.setSuccess(true);
-                response.setData(postList);
-                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+            List<Post> postList = new ArrayList<>();
+            if (post.getType() == null || post.getType().equals("")) {
+                postList = postRepository.findAll(Sort.by(Sort.Order.desc("createdDate")));
             } else {
-                response.setMessage("Missing type");
-                response.setSuccess(false);
-                response.setData(null);
-                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+                postList = postRepository.findAllByType(post.getType().toString(), Sort.by(Sort.Order.desc("createdDate")));
+
             }
+            response.setMessage("Success");
+            response.setSuccess(true);
+            response.setData(postList);
+            response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
         } catch (Exception e) {
             Log log = new Log();
             log.setError(e.getMessage());
