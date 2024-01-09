@@ -43,7 +43,7 @@ public class PostService {
                             List<String> imageList = new ArrayList<>();
                             for (int i = 0; i < post.getImages().size(); i++) {
                                 if (post.getImages().get(i) != null && !post.getImages().get(i).isEmpty()) {
-                                    String imageUrl = UserUtils.convertAndSaveImage(post.getImages().get(i), "/storage/" + retriveUser.getId() + "/", retriveUser.getId());
+                                    String imageUrl = UserUtils.convertAndSaveImage(post.getImages().get(i), "/var/www/html/storage/" + retriveUser.getId() + "/", retriveUser.getId());
                                     imageList.add(imageUrl);
                                 }
                             }
