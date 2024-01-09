@@ -27,4 +27,9 @@ public class FavoriteController {
         return favoriteService.getFavorites(authorizationHeader);
     }
 
+    @DeleteMapping("/deleteFavorite/{id}")
+    private Response deleteFavorite(@RequestHeader("Authorization") String authorizationHeader, @PathVariable("id") String id) {
+        return favoriteService.deleteFavorite(authorizationHeader, id);
+    }
+
 }
