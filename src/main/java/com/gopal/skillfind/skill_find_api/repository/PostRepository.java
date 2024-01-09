@@ -13,7 +13,9 @@ public interface PostRepository extends MongoRepository<Post, String> {
 
 
     List<Post> findAllByType(String type, Sort sort);
-    List<Post> findAll( Sort sort);
 
+    List<Post> findAll(Sort sort);
+
+    List<Post> findAllByUserId(String userId, Sort sort);
 
 }

@@ -31,7 +31,12 @@ public class PostController {
     }
 
     @PostMapping("/deletePost")
-    private Response deletePost(@RequestBody Post post,@RequestHeader("Authorization") String authorizationHeader){
-        return postService.deletePost(post,authorizationHeader);
+    private Response deletePost(@RequestBody Post post, @RequestHeader("Authorization") String authorizationHeader) {
+        return postService.deletePost(post, authorizationHeader);
+    }
+
+    @GetMapping("/getUserPosts")
+    private Response getUserPosts(@RequestHeader("Authorization") String authorizationHeader) {
+        return postService.getUserPosts(authorizationHeader);
     }
 }

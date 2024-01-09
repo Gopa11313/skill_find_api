@@ -167,7 +167,7 @@ public class PostService {
         } catch (Exception e) {
             Log log = new Log();
             log.setError(e.getMessage());
-            log.setSource("/api/skillFind/v1/post/editPost");
+            log.setSource("/api/skillFind/v1/post/getPost");
             log.setTimeStamp(DateUtils.getCurrentDate());
             logService.createLog(log);
 
@@ -213,7 +213,46 @@ public class PostService {
         } catch (Exception e) {
             Log log = new Log();
             log.setError(e.getMessage());
-            log.setSource("/api/skillFind/v1/post/editPost");
+            log.setSource("/api/skillFind/v1/post/deletePost");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+        }
+        return response;
+    }
+
+    public Response getUserPosts(String authorizationHeader) {
+        Response response = new Response();
+        try {
+            if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
+                User retriveUser = userRepository.findUserByToken(authorizationHeader);
+                if (retriveUser != null) {
+                    List<Post> postList = postRepository.findAllByUserId(retriveUser.getId(), Sort.by(Sort.Order.desc("createdDate")));
+                    response.setMessage("Success");
+                    response.setSuccess(true);
+                    response.setData(postList);
+                    response.setStatusCode(StatusCode.SUCCESS.getCode());
+                } else {
+                    response.setMessage("Please login again");
+                    response.setSuccess(false);
+                    response.setData(null);
+                    response.setStatusCode(StatusCode.UNAUTHORIZED.getCode());
+                }
+
+            } else {
+                response.setMessage("Please provide all the required field.");
+                response.setSuccess(false);
+                response.setData(null);
+                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+            }
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/post/getUserPosts");
             log.setTimeStamp(DateUtils.getCurrentDate());
             logService.createLog(log);
 
