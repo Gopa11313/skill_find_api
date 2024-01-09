@@ -1,7 +1,7 @@
 package com.gopal.skillfind.skill_find_api.v1.service;
 
 import com.gopal.skillfind.skill_find_api.model.Log;
-import com.gopal.skillfind.skill_find_api.model.ModifiedPost;
+import com.gopal.skillfind.skill_find_api.model.respones.ModifiedPost;
 import com.gopal.skillfind.skill_find_api.model.Post;
 import com.gopal.skillfind.skill_find_api.model.User;
 import com.gopal.skillfind.skill_find_api.repository.PostRepository;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -164,10 +163,7 @@ public class PostService {
             if (postList.size() > 0) {
                 for (Post itemPost : postList) {
                     User dbUser = userRepository.findUserById(itemPost.getUserId());
-                    modifiedPostList.add(new ModifiedPost(itemPost.getId(), itemPost.getUserId(), itemPost.getPostContent(), itemPost.getCreatedDate(), itemPost.getImages(), itemPost.getJobTitle(), itemPost.getJobDescription(), itemPost.getJobtype(), itemPost.getPerHour(), itemPost.getExpReq(), itemPost.getNote(), itemPost.getType(), itemPost.getLocation(), itemPost.getCoordinates(),
-                            (dbUser != null) ? dbUser.getName() : "",
-                            (dbUser != null) ? dbUser.getProfilePhoto() : "")
-                    );
+                    modifiedPostList.add(new ModifiedPost(itemPost.getId(), itemPost.getUserId(), itemPost.getPostContent(), itemPost.getCreatedDate(), itemPost.getImages(), itemPost.getJobTitle(), itemPost.getJobDescription(), itemPost.getJobtype(), itemPost.getPerHour(), itemPost.getExpReq(), itemPost.getNote(), itemPost.getType(), itemPost.getLocation(), itemPost.getCoordinates(), (dbUser != null) ? dbUser.getName() : "", (dbUser != null) ? dbUser.getProfilePhoto() : ""));
                 }
             }
             response.setMessage("Success");
@@ -246,13 +242,13 @@ public class PostService {
                     if (postList.size() > 0) {
                         for (Post itemPost : postList) {
                             User dbUser = userRepository.findUserById(itemPost.getUserId());
-                            modifiedPostList.add(new ModifiedPost(itemPost.getId(), itemPost.getUserId(), itemPost.getPostContent(), itemPost.getCreatedDate(), itemPost.getImages(), itemPost.getJobTitle(), itemPost.getJobDescription(), itemPost.getJobtype(), itemPost.getPerHour(), itemPost.getExpReq(), itemPost.getNote(), itemPost.getType(), itemPost.getLocation(), itemPost.getCoordinates(), (dbUser != null) ? dbUser.getName() : "",
-                                    (dbUser != null) ? dbUser.getProfilePhoto() : ""));
+                            ModifiedPost newModifiedPost = new ModifiedPost(itemPost.getId(), itemPost.getUserId(), itemPost.getPostContent(), itemPost.getCreatedDate(), itemPost.getImages(), itemPost.getJobTitle(), itemPost.getJobDescription(), itemPost.getJobtype(), itemPost.getPerHour(), itemPost.getExpReq(), itemPost.getNote(), itemPost.getType(), itemPost.getLocation(), itemPost.getCoordinates(), (dbUser != null) ? dbUser.getName() : "", (dbUser != null) ? dbUser.getProfilePhoto() : "");
+                            modifiedPostList.add(newModifiedPost);
                         }
                     }
                     response.setMessage("Success");
                     response.setSuccess(true);
-                    response.setData(postList);
+                    response.setData(modifiedPostList);
                     response.setStatusCode(StatusCode.SUCCESS.getCode());
                 } else {
                     response.setMessage("Please login again");

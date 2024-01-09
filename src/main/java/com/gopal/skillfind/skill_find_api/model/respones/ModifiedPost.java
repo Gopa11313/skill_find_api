@@ -1,15 +1,16 @@
-package com.gopal.skillfind.skill_find_api.model;
+package com.gopal.skillfind.skill_find_api.model.respones;
 
 import com.gopal.skillfind.skill_find_api.utils.Coordinates;
 import com.gopal.skillfind.skill_find_api.utils.JobType;
 import com.gopal.skillfind.skill_find_api.utils.PostType;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModifiedPost {
