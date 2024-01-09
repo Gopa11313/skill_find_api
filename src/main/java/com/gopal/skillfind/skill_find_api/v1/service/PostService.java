@@ -164,7 +164,10 @@ public class PostService {
             if (postList.size() > 0) {
                 for (Post itemPost : postList) {
                     User dbUser = userRepository.findUserById(itemPost.getUserId());
-                    modifiedPostList.add(new ModifiedPost(itemPost.getId(), itemPost.getUserId(), itemPost.getPostContent(), itemPost.getCreatedDate(), itemPost.getImages(), itemPost.getJobTitle(), itemPost.getJobDescription(), itemPost.getJobtype(), itemPost.getPerHour(), itemPost.getExpReq(), itemPost.getNote(), itemPost.getType(), itemPost.getLocation(), itemPost.getCoordinates(), dbUser.getName(), dbUser.getProfilePhoto()));
+                    modifiedPostList.add(new ModifiedPost(itemPost.getId(), itemPost.getUserId(), itemPost.getPostContent(), itemPost.getCreatedDate(), itemPost.getImages(), itemPost.getJobTitle(), itemPost.getJobDescription(), itemPost.getJobtype(), itemPost.getPerHour(), itemPost.getExpReq(), itemPost.getNote(), itemPost.getType(), itemPost.getLocation(), itemPost.getCoordinates(),
+                            (dbUser != null) ? dbUser.getName() : "",
+                            (dbUser != null) ? dbUser.getProfilePhoto() : "")
+                    );
                 }
             }
             response.setMessage("Success");
@@ -243,7 +246,8 @@ public class PostService {
                     if (postList.size() > 0) {
                         for (Post itemPost : postList) {
                             User dbUser = userRepository.findUserById(itemPost.getUserId());
-                            modifiedPostList.add(new ModifiedPost(itemPost.getId(), itemPost.getUserId(), itemPost.getPostContent(), itemPost.getCreatedDate(), itemPost.getImages(), itemPost.getJobTitle(), itemPost.getJobDescription(), itemPost.getJobtype(), itemPost.getPerHour(), itemPost.getExpReq(), itemPost.getNote(), itemPost.getType(), itemPost.getLocation(), itemPost.getCoordinates(), dbUser.getName(), dbUser.getProfilePhoto()));
+                            modifiedPostList.add(new ModifiedPost(itemPost.getId(), itemPost.getUserId(), itemPost.getPostContent(), itemPost.getCreatedDate(), itemPost.getImages(), itemPost.getJobTitle(), itemPost.getJobDescription(), itemPost.getJobtype(), itemPost.getPerHour(), itemPost.getExpReq(), itemPost.getNote(), itemPost.getType(), itemPost.getLocation(), itemPost.getCoordinates(), (dbUser != null) ? dbUser.getName() : "",
+                                    (dbUser != null) ? dbUser.getProfilePhoto() : ""));
                         }
                     }
                     response.setMessage("Success");
