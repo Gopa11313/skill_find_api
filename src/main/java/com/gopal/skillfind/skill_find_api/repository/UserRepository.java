@@ -12,6 +12,7 @@ import java.util.List;
 @Repository
 public interface UserRepository extends MongoRepository<User,String> {
     User findUserByEmail(String email);
+    User findUserById(String Id);
 
     User findUserByToken(String Token);
 

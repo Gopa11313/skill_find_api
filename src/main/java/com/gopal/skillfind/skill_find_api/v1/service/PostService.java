@@ -1,6 +1,7 @@
 package com.gopal.skillfind.skill_find_api.v1.service;
 
 import com.gopal.skillfind.skill_find_api.model.Log;
+import com.gopal.skillfind.skill_find_api.model.ModifiedPost;
 import com.gopal.skillfind.skill_find_api.model.Post;
 import com.gopal.skillfind.skill_find_api.model.User;
 import com.gopal.skillfind.skill_find_api.repository.PostRepository;
@@ -154,15 +155,21 @@ public class PostService {
         Response response = new Response();
         try {
             List<Post> postList = new ArrayList<>();
+            List<ModifiedPost> modifiedPostList = new ArrayList<>();
             if (post.getType() == null || post.getType().equals("")) {
                 postList = postRepository.findAll(Sort.by(Sort.Order.desc("createdDate")));
             } else {
                 postList = postRepository.findAllByType(post.getType().toString(), Sort.by(Sort.Order.desc("createdDate")));
-
+            }
+            if (postList.size() > 0) {
+                for (Post itemPost : postList) {
+                    User dbUser = userRepository.findUserById(itemPost.getUserId());
+                    modifiedPostList.add(new ModifiedPost(itemPost.getId(), itemPost.getUserId(), itemPost.getPostContent(), itemPost.getCreatedDate(), itemPost.getImages(), itemPost.getJobTitle(), itemPost.getJobDescription(), itemPost.getJobtype(), itemPost.getPerHour(), itemPost.getExpReq(), itemPost.getNote(), itemPost.getType(), itemPost.getLocation(), itemPost.getCoordinates(), dbUser.getName(), dbUser.getProfilePhoto()));
+                }
             }
             response.setMessage("Success");
             response.setSuccess(true);
-            response.setData(postList);
+            response.setData(modifiedPostList);
             response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
         } catch (Exception e) {
             Log log = new Log();
@@ -232,6 +239,13 @@ public class PostService {
                 User retriveUser = userRepository.findUserByToken(authorizationHeader);
                 if (retriveUser != null) {
                     List<Post> postList = postRepository.findAllByUserId(retriveUser.getId(), Sort.by(Sort.Order.desc("createdDate")));
+                    List<ModifiedPost> modifiedPostList = new ArrayList<>();
+                    if (postList.size() > 0) {
+                        for (Post itemPost : postList) {
+                            User dbUser = userRepository.findUserById(itemPost.getUserId());
+                            modifiedPostList.add(new ModifiedPost(itemPost.getId(), itemPost.getUserId(), itemPost.getPostContent(), itemPost.getCreatedDate(), itemPost.getImages(), itemPost.getJobTitle(), itemPost.getJobDescription(), itemPost.getJobtype(), itemPost.getPerHour(), itemPost.getExpReq(), itemPost.getNote(), itemPost.getType(), itemPost.getLocation(), itemPost.getCoordinates(), dbUser.getName(), dbUser.getProfilePhoto()));
+                        }
+                    }
                     response.setMessage("Success");
                     response.setSuccess(true);
                     response.setData(postList);
