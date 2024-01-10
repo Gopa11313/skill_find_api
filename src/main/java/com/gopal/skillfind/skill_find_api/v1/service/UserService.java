@@ -1,8 +1,11 @@
 package com.gopal.skillfind.skill_find_api.v1.service;
 
+import com.gopal.skillfind.skill_find_api.model.Favorite;
 import com.gopal.skillfind.skill_find_api.model.Log;
 import com.gopal.skillfind.skill_find_api.model.User;
 import com.gopal.skillfind.skill_find_api.model.UserPreference;
+import com.gopal.skillfind.skill_find_api.model.respones.ModifiedUser;
+import com.gopal.skillfind.skill_find_api.repository.FavoriteRepository;
 import com.gopal.skillfind.skill_find_api.repository.ServiceRepository;
 import com.gopal.skillfind.skill_find_api.repository.UserPreferenceRepository;
 import com.gopal.skillfind.skill_find_api.repository.UserRepository;
@@ -32,13 +35,14 @@ public class UserService {
     private final String salt = "$2a$16$5qy3niSxBtkKQCqDPcvtWONCFy4fi4ALQTRPl18amIj8x40ERc/tq";
 
     private UserPreferenceRepository userPreferenceRepository;
+    private FavoriteRepository favoriteRepository;
 
-
-    public UserService(UserRepository userRepository, LogService logService, UserPreferenceRepository userPreferenceRepository, ServiceRepository serviceRepository) {
+    public UserService(UserRepository userRepository, LogService logService, UserPreferenceRepository userPreferenceRepository, ServiceRepository serviceRepository, FavoriteRepository favoriteRepository) {
         this.userRepository = userRepository;
         this.logService = logService;
         this.userPreferenceRepository = userPreferenceRepository;
         this.serviceRepository = serviceRepository;
+        this.favoriteRepository = favoriteRepository;
     }
 
 
@@ -346,10 +350,17 @@ public class UserService {
                         pageable = PageRequest.of(0, 20);
                     }
                     Page<User> usersPage = userRepository.findByAccountType("SUPERUSER", pageable);
-
+                    List<ModifiedUser> modifiedUsers = new ArrayList<>();
+                    if (usersPage.getContent().size() > 0) {
+                        for (User user : usersPage.getContent()) {
+                            Favorite favorite = favoriteRepository.findFavoriteByUserIdAndContentId(retriveUser.getId(), user.getId());
+                            ModifiedUser modifiedUser = new ModifiedUser(user.getId(), user.getName(), user.getEmail(), user.getPhNo(), user.getBio(), user.getLocation(), user.getSkills(), user.getProfilePhoto(), user.getDob(), user.getWorkImages(), user.getStartedWorkingYear(), user.getWorkPreference(), favorite != null);
+                            modifiedUsers.add(modifiedUser);
+                        }
+                    }
                     response.setMessage("Data");
                     response.setSuccess(true);
-                    response.setData(usersPage.getContent());
+                    response.setData(modifiedUsers);
                     response.setStatusCode(StatusCode.SUCCESS.getCode());
                 } else {
                     response.setMessage("UnAuthorized User");
