@@ -48,7 +48,7 @@ public class SkillFindApiApplication {
                     //favorites
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/favorite/createFavorite").permitAll()
                     .antMatchers(HttpMethod.GET, "/api/skillFind/v1/favorite/getFavorites").permitAll()
-                    .antMatchers(HttpMethod.GET, "/api/skillFind/v1/favorite/deleteFavorite/{id}").permitAll()
+                    .antMatchers(HttpMethod.DELETE, "/api/skillFind/v1/favorite/deleteFavorite/{id}").permitAll()
 
                     //admin
                     .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/createAdminUser").permitAll()
