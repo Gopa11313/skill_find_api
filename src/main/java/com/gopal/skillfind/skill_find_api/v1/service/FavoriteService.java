@@ -37,14 +37,22 @@ public class FavoriteService {
             if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
                 User retriveUser = userRepository.findUserByToken(authorizationHeader);
                 if (retriveUser != null) {
-                    favorite.setUserId(retriveUser.getId());
-                    favorite.setCreatedDate(DateUtils.getCurrentDate());
+                    Favorite dbFavorite = favoriteRepository.findFavoriteByContentIdAndUserId(favorite.getContentId(), retriveUser.getId());
+                    if(dbFavorite==null) {
+                        favorite.setUserId(retriveUser.getId());
+                        favorite.setCreatedDate(DateUtils.getCurrentDate());
 
-                    favoriteRepository.save(favorite);
-                    response.setMessage("Success");
-                    response.setSuccess(true);
-                    response.setData(null);
-                    response.setStatusCode(StatusCode.SUCCESS.getCode());
+                        favoriteRepository.save(favorite);
+                        response.setMessage("Success");
+                        response.setSuccess(true);
+                        response.setData(null);
+                        response.setStatusCode(StatusCode.SUCCESS.getCode());
+                    }else{
+                        response.setMessage("Already is in favorite");
+                        response.setSuccess(false);
+                        response.setData(null);
+                        response.setStatusCode(StatusCode.DUPLICATE_DATA.getCode());
+                    }
                 } else {
                     response.setMessage("UnAuthorized User");
                     response.setSuccess(false);
@@ -128,7 +136,7 @@ public class FavoriteService {
             if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
                 User retriveUser = userRepository.findUserByToken(authorizationHeader);
                 if (retriveUser != null) {
-                    Favorite favorite = favoriteRepository.findFavoriteByIdAndUserId(id, retriveUser.getId());
+                    Favorite favorite = favoriteRepository.findFavoriteByContentIdAndUserId(id, retriveUser.getId());
                     if (favorite != null) {
                         favoriteRepository.delete(favorite);
                         response.setMessage("Success");

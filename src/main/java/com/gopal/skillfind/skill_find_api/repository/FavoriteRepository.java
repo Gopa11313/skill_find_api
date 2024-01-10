@@ -12,7 +12,7 @@ public interface FavoriteRepository extends MongoRepository<Favorite, String> {
 
     List<Favorite> findAllByUserId(String userId, Sort sort);
 
-    Favorite findFavoriteByIdAndUserId(String id, String userId);
+    Favorite findFavoriteByContentIdAndUserId(String contentId, String userId);
 
     Favorite findFavoriteByUserIdAndContentId(String userId, String contentId);
 }

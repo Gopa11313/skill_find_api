@@ -6,7 +6,8 @@ public enum StatusCode {
     UNAUTHORIZED(401, "Unauthorized"),
     FORBIDDEN(403, "Forbidden"),
     NOT_FOUND(404, "Not Found"),
-    INTERNAL_SERVER_ERROR(500, "Internal Server Error");
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error"),
+    DUPLICATE_DATA(409, "Duplicate Data");
 
     private int code;
     private String message;
