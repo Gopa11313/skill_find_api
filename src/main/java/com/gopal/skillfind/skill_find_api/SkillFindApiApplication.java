@@ -50,6 +50,11 @@ public class SkillFindApiApplication {
                     .antMatchers(HttpMethod.GET, "/api/skillFind/v1/favorite/getFavorites").permitAll()
                     .antMatchers(HttpMethod.DELETE, "/api/skillFind/v1/favorite/deleteFavorite/{id}").permitAll()
 
+                    //chat
+                    .antMatchers(HttpMethod.POST, "/api/skillFind/v1/chat/createChat").permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/skillFind/v1/chat/getChat/{page}").permitAll()
+
+
                     //admin
                     .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/createAdminUser").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/adminLogin").permitAll()

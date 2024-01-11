@@ -19,4 +19,6 @@ public class Chat {
     private String id;
     private List<Participants> participants;
     private ChatType type;
+    private String createDate;
+    private String modifiedDate;
 }

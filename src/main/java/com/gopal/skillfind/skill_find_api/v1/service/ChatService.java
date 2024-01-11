@@ -13,6 +13,8 @@ import com.gopal.skillfind.skill_find_api.utils.Participants;
 import com.gopal.skillfind.skill_find_api.utils.Response;
 import com.gopal.skillfind.skill_find_api.utils.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Part;
@@ -46,6 +48,8 @@ public class ChatService {
                         message.setReceiver(new Participants(receiver.getId(), receiver.getEmail()));
                         message.setContent(chat.getMessage());
                         message.setTimestamp(DateUtils.getCurrentDate());
+                        dbChat.setModifiedDate(DateUtils.getCurrentDate());
+                        chatRepository.save(dbChat);
                         messageRepository.save(message);
                     } else {
                         Chat toBeChat = new Chat();
@@ -53,6 +57,8 @@ public class ChatService {
                         participants.add(new Participants(retriveUser.getId(), retriveUser.getEmail()));
                         participants.add(new Participants(receiver.getId(), receiver.getEmail()));
                         toBeChat.setParticipants(participants);
+                        toBeChat.setModifiedDate(DateUtils.getCurrentDate());
+                        toBeChat.setCreateDate(DateUtils.getCurrentDate());
                         Chat savedChat = chatRepository.save(toBeChat);
                         Message message = new Message();
                         message.setChatId(savedChat.getId());
@@ -78,14 +84,46 @@ public class ChatService {
         } catch (Exception e) {
             Log log = new Log();
             log.setError(e.getMessage());
-            log.setSource("/api/skillFind/v1/favorite/createFavorite");
+            log.setSource("/api/skillFind/v1/chat/createChat");
             log.setTimeStamp(DateUtils.getCurrentDate());
             logService.createLog(log);
             response.setMessage("internal server error");
             response.setSuccess(false);
             response.setData(null);
             response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+        }
+        return response;
+    }
 
+    public Response getChats(String authorizationHeader,String  page) {
+        Response response = new Response();
+        try {
+            if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
+                User retriveUser = userRepository.findUserByToken(authorizationHeader);
+                if (retriveUser != null) {
+                    Pageable pageable = PageRequest.of(Integer.parseInt(page), 10);
+                    List<Chat> dbChats = chatRepository.findAllByOrderByModifiedDateDesc(pageable);
+                    response.setMessage("Chats data");
+                    response.setSuccess(true);
+                    response.setData(dbChats);
+                    response.setStatusCode(StatusCode.SUCCESS.getCode());
+                } else {
+                    response.setMessage("Missing Token");
+                    response.setSuccess(false);
+                    response.setData(null);
+                    response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+                }
+            }
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/chat/createChat");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
         }
         return response;
     }
