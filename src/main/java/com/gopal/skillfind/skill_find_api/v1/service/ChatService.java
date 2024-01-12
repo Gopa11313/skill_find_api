@@ -95,7 +95,7 @@ public class ChatService {
         return response;
     }
 
-    public Response getChats(String authorizationHeader,String  page) {
+    public Response getChats(String authorizationHeader, String page) {
         Response response = new Response();
         try {
             if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
@@ -118,6 +118,72 @@ public class ChatService {
             Log log = new Log();
             log.setError(e.getMessage());
             log.setSource("/api/skillFind/v1/chat/createChat");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+        }
+        return response;
+    }
+
+    public Response createChatByID(String senderID, String receiverID, String content) {
+        Response response = new Response();
+        try {
+            User sendUser = userRepository.findUserById(senderID);
+            if (sendUser != null) {
+                Chat dbChat = chatRepository.findByParticipantsUserIdAndParticipantsUserId(sendUser.getId(), receiverID);
+                User receiver = userRepository.findUserById(receiverID);
+                if (dbChat != null) {
+                    Message message = new Message();
+                    message.setChatId(dbChat.getId());
+                    message.setSender(new Participants(sendUser.getId(), sendUser.getEmail()));
+                    message.setReceiver(new Participants(receiver.getId(), receiver.getEmail()));
+                    message.setContent(content);
+                    message.setTimestamp(DateUtils.getCurrentDate());
+                    dbChat.setModifiedDate(DateUtils.getCurrentDate());
+                    chatRepository.save(dbChat);
+                    messageRepository.save(message);
+
+                    response.setMessage("Success");
+                    response.setSuccess(true);
+                    response.setData(dbChat);
+                    response.setStatusCode(StatusCode.SUCCESS.getCode());
+                } else {
+                    Chat toBeChat = new Chat();
+                    List<Participants> participants = new ArrayList<>();
+                    participants.add(new Participants(sendUser.getId(), sendUser.getEmail()));
+                    participants.add(new Participants(receiver.getId(), receiver.getEmail()));
+                    toBeChat.setParticipants(participants);
+                    toBeChat.setModifiedDate(DateUtils.getCurrentDate());
+                    toBeChat.setCreateDate(DateUtils.getCurrentDate());
+                    Chat savedChat = chatRepository.save(toBeChat);
+                    Message message = new Message();
+                    message.setChatId(savedChat.getId());
+                    message.setSender(new Participants(sendUser.getId(), sendUser.getEmail()));
+                    message.setReceiver(new Participants(receiver.getId(), receiver.getEmail()));
+                    message.setContent(content);
+                    message.setTimestamp(DateUtils.getCurrentDate());
+                    messageRepository.save(message);
+
+                    response.setMessage("Success");
+                    response.setSuccess(true);
+                    response.setData(savedChat);
+                    response.setStatusCode(StatusCode.SUCCESS.getCode());
+                }
+            } else {
+                response.setMessage("User Not Found. Login again");
+                response.setSuccess(false);
+                response.setData(null);
+                response.setStatusCode(StatusCode.NOT_FOUND.getCode());
+            }
+
+
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/chat/createChatByID");
             log.setTimeStamp(DateUtils.getCurrentDate());
             logService.createLog(log);
             response.setMessage("internal server error");
