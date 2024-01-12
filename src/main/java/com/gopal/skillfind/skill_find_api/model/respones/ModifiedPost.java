@@ -31,5 +31,6 @@ public class ModifiedPost {
     private Coordinates coordinates;
     private String userName;
     private String userProfile;
+    private String email;
 
 }
