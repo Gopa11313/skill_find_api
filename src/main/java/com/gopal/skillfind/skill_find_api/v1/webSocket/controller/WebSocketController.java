@@ -4,6 +4,7 @@ import com.gopal.skillfind.skill_find_api.model.Chat;
 import com.gopal.skillfind.skill_find_api.model.Message;
 import com.gopal.skillfind.skill_find_api.model.respones.ChatMessage;
 import com.gopal.skillfind.skill_find_api.model.respones.ModifiedChat;
+import com.gopal.skillfind.skill_find_api.repository.ChatRepository;
 import com.gopal.skillfind.skill_find_api.repository.MessageRepository;
 import com.gopal.skillfind.skill_find_api.utils.Response;
 import com.gopal.skillfind.skill_find_api.utils.StatusCode;
@@ -35,13 +36,16 @@ public class WebSocketController {
     private MessageService messageService;
 
     @Autowired
+    private ChatRepository chatRepository;
+
+    @Autowired
     private MessageRepository messageRepository;
 
-    @MessageMapping("/chat.createChat")
-    public Response createChat(@Payload ModifiedChat chatCreateRequest, SimpMessageHeaderAccessor headerAccessor) {
-        String authToken = (String) headerAccessor.getSessionAttributes().get("token");
-        return chatService.createChat(chatCreateRequest, authToken);
-    }
+//    @MessageMapping("/chat.createChat")
+//    public Response createChat(@Payload ModifiedChat chatCreateRequest, SimpMessageHeaderAccessor headerAccessor) {
+//        String authToken = (String) headerAccessor.getSessionAttributes().get("token");
+//        return chatService.createChat(chatCreateRequest, authToken);
+//    }
 
     @MessageMapping("/chat/{senderIDString}/{receiverIDString}")
     @SendTo({"/topics/event/{senderIDString}/{receiverIDString}", "/topics/event/{receiverIDString}/{senderIDString}"})
@@ -63,4 +67,31 @@ public class WebSocketController {
         return response;
     }
 
+
+    @MessageMapping("/chat/{senderIDString}/{receiverIDString}/listen")
+    @SendTo("/topics/event/{senderIDString}/{receiverIDString}")
+    public Response subscribeToSenderReceiverChatList(@DestinationVariable String receiverIDString, @DestinationVariable String senderIDString) {
+
+        String senderID = senderIDString;
+        String receiverID = receiverIDString;
+        Chat chat = chatRepository.findByParticipantsUserIdAndParticipantsUserId(senderID, receiverID);
+        Response response = new Response();
+        if (chat==null) {
+            return response;
+        }
+        Pageable pageable = PageRequest.of(1, 20);
+        List<Message> messagesList = messageRepository.findAllById(chat.getId(), pageable);
+        response.setData(messagesList);
+        response.setMessage("Success");
+        response.setSuccess(true);
+        response.setStatusCode(StatusCode.SUCCESS.getCode());
+        return response;
+    }
+
+//    @MessageMapping("/hello/{receiverIDString}")
+//    @SendTo("/topics/event/{receiverIDString}")
+//    public List<Chat> getChatWithReceiver(String content, @DestinationVariable String receiverIDString) {
+//        int receiverID = Integer.parseInt(receiverIDString);
+//        return chatService.findByReceiver(receiverID);
+//    }
 }

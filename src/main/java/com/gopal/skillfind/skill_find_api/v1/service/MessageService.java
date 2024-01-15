@@ -6,8 +6,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MessageService {
-    @Autowired
-    private MessageService messageService;
 
 //    private Response createMessage(String senderID, String receiverID, String content) {
 //
