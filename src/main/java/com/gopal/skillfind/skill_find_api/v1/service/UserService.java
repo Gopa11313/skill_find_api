@@ -76,7 +76,7 @@ public class UserService {
                         } catch (Exception e) {
                             System.err.println("Error creating folder: " + e.getMessage());
                         }
-                        response.setData(new String[]{savedUser.getToken(), savedUser.getRefToken(), savedUser.getLoginType().toString(), askQuestion.toString()});
+                        response.setData(new String[]{savedUser.getToken(), savedUser.getRefToken(), savedUser.getLoginType().toString(), askQuestion.toString(), savedUser.getId()});
                         response.setMessage("Successfully Created.");
                         response.setStatusCode(StatusCode.SUCCESS.getCode());
                         response.setSuccess(true);
@@ -136,7 +136,7 @@ public class UserService {
                                 askQuestion = true;
                             }
                             response.setSuccess(true);
-                            response.setData(new String[]{retirvedUser.getToken(), retirvedUser.getRefToken(), retirvedUser.getLoginType().toString(), askQuestion.toString()});
+                            response.setData(new String[]{retirvedUser.getToken(), retirvedUser.getRefToken(), retirvedUser.getLoginType().toString(), askQuestion.toString(), retirvedUser.getId()});
                             response.setStatusCode(StatusCode.SUCCESS.getCode());
                             response.setMessage("Success");
                         } else {
