@@ -21,6 +21,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -50,6 +51,7 @@ public class WebSocketController {
     @MessageMapping("/chat/{senderIDString}/{receiverIDString}")
     @SendTo({"/topics/event/{senderIDString}/{receiverIDString}", "/topics/event/{receiverIDString}/{senderIDString}"})
     public Response getChatWithReceiverAndSender1(String content, @DestinationVariable String receiverIDString, @DestinationVariable String senderIDString) {
+        System.out.println("getChatWithReceiverAndSender1" + senderIDString);
         String senderID = senderIDString;
         String receiverID = receiverIDString;
         Response chat = chatService.createChatByID(senderID, receiverID, content);
@@ -71,12 +73,12 @@ public class WebSocketController {
     @MessageMapping("/chat/{senderIDString}/{receiverIDString}/listen")
     @SendTo("/topics/event/{senderIDString}/{receiverIDString}")
     public Response subscribeToSenderReceiverChatList(@DestinationVariable String receiverIDString, @DestinationVariable String senderIDString) {
-
+        System.out.println("subscribeToSenderReceiverChatList" + senderIDString);
         String senderID = senderIDString;
         String receiverID = receiverIDString;
         Chat chat = chatRepository.findByParticipantsUserIdAndParticipantsUserId(senderID, receiverID);
         Response response = new Response();
-        if (chat==null) {
+        if (chat == null) {
             return response;
         }
         Pageable pageable = PageRequest.of(1, 20);
@@ -88,10 +90,11 @@ public class WebSocketController {
         return response;
     }
 
-//    @MessageMapping("/hello/{receiverIDString}")
-//    @SendTo("/topics/event/{receiverIDString}")
-//    public List<Chat> getChatWithReceiver(String content, @DestinationVariable String receiverIDString) {
-//        int receiverID = Integer.parseInt(receiverIDString);
-//        return chatService.fin(receiverID);
-//    }
+    @MessageMapping("/hello/{receiverIDString}")
+    @SendTo("/topics/event/{receiverIDString}")
+    public List<Chat> getChatWithReceiver(String content, @DestinationVariable String receiverIDString) {
+        System.out.println("getChatWithReceiver" + receiverIDString);
+        int receiverID = Integer.parseInt(receiverIDString);
+        return new ArrayList<>();
+    }
 }
