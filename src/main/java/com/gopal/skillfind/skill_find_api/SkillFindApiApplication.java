@@ -64,7 +64,7 @@ public class SkillFindApiApplication {
                     .antMatchers(HttpMethod.POST, "/api/skillFind/service/getServices").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/skillFind/service/deleteService").permitAll()
 
-
+                    .antMatchers("/my-ws/**").permitAll() // Adjust this based on your security needs
                     .anyRequest().authenticated();
         }
     }

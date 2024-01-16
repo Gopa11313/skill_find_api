@@ -92,6 +92,6 @@ public class WebSocketController {
 //    @SendTo("/topics/event/{receiverIDString}")
 //    public List<Chat> getChatWithReceiver(String content, @DestinationVariable String receiverIDString) {
 //        int receiverID = Integer.parseInt(receiverIDString);
-//        return chatService.findByReceiver(receiverID);
+//        return chatService.fin(receiverID);
 //    }
 }
