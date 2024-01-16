@@ -66,6 +66,8 @@ public class SkillFindApiApplication {
 
                     .antMatchers("/my-ws", "/my-ws/**").permitAll() // Adjust this based on your security needs
                     .anyRequest().authenticated();
+
+
         }
     }
 
