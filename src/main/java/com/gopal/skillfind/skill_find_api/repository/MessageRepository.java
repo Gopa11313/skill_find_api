@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends MongoRepository<Message, String> {
-    List<Message> findAllById(String Id, Pageable pageable);
+    List<Message> findAllByChatId(String ChatId, Pageable pageable);
 }
