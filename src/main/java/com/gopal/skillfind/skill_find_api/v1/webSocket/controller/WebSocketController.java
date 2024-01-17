@@ -55,9 +55,12 @@ public class WebSocketController {
         String senderID = senderIDString;
         String receiverID = receiverIDString;
         Response chat = chatService.createChatByID(senderID, receiverID, content);
+        System.out.println("=====================================");
+        System.out.println(chat.getData());
+        System.out.println("=====================================");
         Response response = new Response();
         if (!chat.getSuccess()) {
-            return chat;
+            return response;
         }
         Chat data = (Chat) chat.getData();
         Pageable pageable = PageRequest.of(1, 20);
@@ -66,6 +69,9 @@ public class WebSocketController {
         response.setMessage("Success");
         response.setSuccess(true);
         response.setStatusCode(StatusCode.SUCCESS.getCode());
+        System.out.println("=====================================");
+        System.out.println(response);
+        System.out.println("=====================================");
         return response;
     }
 
@@ -77,6 +83,9 @@ public class WebSocketController {
         String senderID = senderIDString;
         String receiverID = receiverIDString;
         Chat chat = chatRepository.findByParticipantsUserIdAndParticipantsUserId(senderID, receiverID);
+        System.out.println("=====================================");
+        System.out.println(chat);
+        System.out.println("=====================================");
         Response response = new Response();
         if (chat == null) {
             return response;
@@ -87,6 +96,9 @@ public class WebSocketController {
         response.setMessage("Success");
         response.setSuccess(true);
         response.setStatusCode(StatusCode.SUCCESS.getCode());
+        System.out.println("=====================================");
+        System.out.println(response);
+        System.out.println("=====================================");
         return response;
     }
 
