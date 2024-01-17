@@ -82,7 +82,7 @@ public class WebSocketController {
         System.out.println("subscribeToSenderReceiverChatList" + senderIDString);
         String senderID = senderIDString;
         String receiverID = receiverIDString;
-        Chat chat = chatRepository.findByParticipantsUserIdInAndParticipantsUserIdIn(senderID, receiverID);
+        Chat chat = chatRepository.findByParticipantsUserIdAndParticipantsUserId(senderID, receiverID);
         System.out.println("===================subscribeToSenderReceiverChatList==================");
         System.out.println(chat);
         System.out.println("=====================================");

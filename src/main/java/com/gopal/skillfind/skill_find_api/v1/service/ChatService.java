@@ -39,7 +39,7 @@ public class ChatService {
             if (token != null && !token.isEmpty()) {
                 User retriveUser = userRepository.findUserByToken(token);
                 if (retriveUser != null) {
-                    Chat dbChat = chatRepository.findByParticipantsUserIdInAndParticipantsUserIdIn(retriveUser.getId(), chat.getParticipants().get(0).getUserId());
+                    Chat dbChat = chatRepository.findByParticipantsUserIdAndParticipantsUserId(retriveUser.getId(), chat.getParticipants().get(0).getUserId());
                     User receiver = userRepository.findUserById(chat.getParticipants().get(0).getUserId());
                     if (dbChat != null) {
                         Message message = new Message();
@@ -133,7 +133,7 @@ public class ChatService {
         try {
             User sendUser = userRepository.findUserById(senderID);
             if (sendUser != null) {
-                Chat dbChat = chatRepository.findByParticipantsUserIdInAndParticipantsUserIdIn(sendUser.getId(), receiverID);
+                Chat dbChat = chatRepository.findByParticipantsUserIdAndParticipantsUserId(sendUser.getId(), receiverID);
                 User receiver = userRepository.findUserById(receiverID);
                 if (dbChat != null) {
                     Message message = new Message();
