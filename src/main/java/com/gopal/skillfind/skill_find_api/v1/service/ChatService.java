@@ -133,7 +133,7 @@ public class ChatService {
         try {
             User sendUser = userRepository.findUserById(senderID);
             if (sendUser != null) {
-                Chat dbChat = chatRepository.findByParticipantsUserIdAndParticipantsUserId(sendUser.getId(), receiverID);
+                Chat dbChat = chatRepository.findByParticipantsUserIdInAndParticipantsUserIdIn(sendUser.getId(), receiverID);
                 User receiver = userRepository.findUserById(receiverID);
                 if (dbChat != null) {
                     Message message = new Message();
