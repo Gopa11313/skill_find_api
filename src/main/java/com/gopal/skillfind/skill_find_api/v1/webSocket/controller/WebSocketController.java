@@ -55,7 +55,7 @@ public class WebSocketController {
         String senderID = senderIDString;
         String receiverID = receiverIDString;
         Response chat = chatService.createChatByID(senderID, receiverID, content);
-        System.out.println("=====================================");
+        System.out.println("=================getChatWithReceiverAndSender1====================");
         System.out.println(chat.getData());
         System.out.println("=====================================");
         Response response = new Response();
@@ -83,7 +83,7 @@ public class WebSocketController {
         String senderID = senderIDString;
         String receiverID = receiverIDString;
         Chat chat = chatRepository.findByParticipantsUserIdAndParticipantsUserId(senderID, receiverID);
-        System.out.println("=====================================");
+        System.out.println("===================subscribeToSenderReceiverChatList==================");
         System.out.println(chat);
         System.out.println("=====================================");
         Response response = new Response();

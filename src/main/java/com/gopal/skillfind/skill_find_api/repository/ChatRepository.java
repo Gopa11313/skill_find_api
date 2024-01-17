@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface ChatRepository extends MongoRepository<Chat, String> {
-    @Query("{ 'participants': { $all: [ { 'userId': ?0 }, { 'userId': ?1 } ] } }")
+    @Query("{ 'participants': { $elemMatch: { 'userId': ?0 } }, 'participants': { $elemMatch: { 'userId': ?1 } } }")
     Chat findByParticipantsUserIdAndParticipantsUserId(String userId1, String userId2);
 
     List<Chat> findAllByOrderByModifiedDateDesc(
