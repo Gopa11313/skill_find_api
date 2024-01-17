@@ -64,7 +64,7 @@ public class WebSocketController {
         }
         Chat data = (Chat) chat.getData();
         Pageable pageable = PageRequest.of(1, 20);
-        List<Message> messagesList = messageRepository.findAllById(data.getId(), pageable);
+        List<Message> messagesList = messageRepository.findAllByChatId(data.getId(), pageable);
         response.setData(messagesList);
         response.setMessage("Success");
         response.setSuccess(true);
@@ -91,7 +91,7 @@ public class WebSocketController {
             return response;
         }
         Pageable pageable = PageRequest.of(1, 20);
-        List<Message> messagesList = messageRepository.findAllById(chat.getId(), pageable);
+        List<Message> messagesList = messageRepository.findAllByChatId(chat.getId(), pageable);
         response.setData(messagesList);
         response.setMessage("Success");
         response.setSuccess(true);
