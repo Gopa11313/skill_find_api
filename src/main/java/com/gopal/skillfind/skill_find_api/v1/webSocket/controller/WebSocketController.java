@@ -114,7 +114,7 @@ public class WebSocketController {
     @SendTo("/topics/event/profile/{id}")
     public Response subscribeToChatProfile(@DestinationVariable String id) {
         Response response = new Response();
-        List<Chat> chats = chatRepository.findByParticipantsUserIdOrParticipantsUserId(id, id);
+        List<Chat> chats = chatRepository.findByParticipantsUserIdOrderByModifiedDateDesc(id);
         System.out.println("=================subscribeToChatProfile================");
         System.out.println(chats);
         System.out.println("=================================");
