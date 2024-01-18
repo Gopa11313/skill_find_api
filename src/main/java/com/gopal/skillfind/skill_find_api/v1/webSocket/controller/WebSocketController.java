@@ -126,8 +126,8 @@ public class WebSocketController {
                 Pageable pageable = PageRequest.of(0, 30);
                 List<Message> messageList = messageRepository.findAllByChatId(chat.getId(), pageable);
                 String userId = Objects.equals(chat.getParticipants().get(0).getUserId(), receiverIDString)
-                        ? chat.getParticipants().get(0).getUserId()
-                        : chat.getParticipants().get(1).getUserId();
+                        ? chat.getParticipants().get(1).getUserId()
+                        : chat.getParticipants().get(0).getUserId();
                 User user = userRepository.findUserById(userId);
                 chatProfileResponse.setProfileId(user.getId());
                 chatProfileResponse.setName(user.getName().isEmpty() ? "" : user.getName());
