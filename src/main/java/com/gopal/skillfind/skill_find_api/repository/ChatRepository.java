@@ -14,7 +14,8 @@ public interface ChatRepository extends MongoRepository<Chat, String> {
     Chat findByParticipantsUserIdAndParticipantsUserId(String userId1, String userId2);
 
 
-
+    @Query("{ or: [ {'participants.userId': ?0 }, {'participants.userId': ?1 } ] }")
+    List<Chat> findByParticipantsUserIdOrParticipantsUserId(String userId1, String userId2);
     List<Chat> findAllByOrderByModifiedDateDesc(
             Pageable pageable);
 }

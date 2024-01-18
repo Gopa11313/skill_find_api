@@ -2,10 +2,13 @@ package com.gopal.skillfind.skill_find_api.v1.webSocket.controller;
 
 import com.gopal.skillfind.skill_find_api.model.Chat;
 import com.gopal.skillfind.skill_find_api.model.Message;
+import com.gopal.skillfind.skill_find_api.model.User;
 import com.gopal.skillfind.skill_find_api.model.respones.ChatMessage;
+import com.gopal.skillfind.skill_find_api.model.respones.ChatProfileResponse;
 import com.gopal.skillfind.skill_find_api.model.respones.ModifiedChat;
 import com.gopal.skillfind.skill_find_api.repository.ChatRepository;
 import com.gopal.skillfind.skill_find_api.repository.MessageRepository;
+import com.gopal.skillfind.skill_find_api.repository.UserRepository;
 import com.gopal.skillfind.skill_find_api.utils.Response;
 import com.gopal.skillfind.skill_find_api.utils.StatusCode;
 import com.gopal.skillfind.skill_find_api.v1.service.ChatService;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 public class WebSocketController {
@@ -42,6 +46,8 @@ public class WebSocketController {
     @Autowired
     private MessageRepository messageRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 //    @MessageMapping("/chat.createChat")
 //    public Response createChat(@Payload ModifiedChat chatCreateRequest, SimpMessageHeaderAccessor headerAccessor) {
 //        String authToken = (String) headerAccessor.getSessionAttributes().get("token");
@@ -63,7 +69,7 @@ public class WebSocketController {
             return response;
         }
         Chat data = (Chat) chat.getData();
-        Pageable pageable = PageRequest.of(0, 20);
+        Pageable pageable = PageRequest.of(0, 30);
         List<Message> messagesList = messageRepository.findAllByChatId(data.getId(), pageable);
         response.setData(messagesList);
         response.setMessage("Success");
@@ -72,6 +78,8 @@ public class WebSocketController {
         System.out.println("=====================================");
         System.out.println(response);
         System.out.println("=====================================");
+        subscribeToChatProfile(senderIDString);
+        subscribeToChatProfile(receiverIDString);
         return response;
     }
 
@@ -90,7 +98,7 @@ public class WebSocketController {
         if (chat == null) {
             return response;
         }
-        Pageable pageable = PageRequest.of(0, 20);
+        Pageable pageable = PageRequest.of(0, 30);
         List<Message> messagesList = messageRepository.findAllByChatId(chat.getId(), pageable);
         response.setData(messagesList);
         response.setMessage("Success");
@@ -99,6 +107,38 @@ public class WebSocketController {
         System.out.println("=====================================");
         System.out.println(response);
         System.out.println("=====================================");
+        return response;
+    }
+
+    @MessageMapping("/chat/profile/{id}/listen")
+    @SendTo("/topics/event/profile/{id}")
+    public Response subscribeToChatProfile(@DestinationVariable String id) {
+        Response response = new Response();
+        List<Chat> chats = chatRepository.findByParticipantsUserIdOrParticipantsUserId(id, id);
+
+        List<ChatProfileResponse> profileResponseList = new ArrayList<>();
+        if (chats != null) {
+            for (Chat chat : chats) {
+                ChatProfileResponse chatProfileResponse = new ChatProfileResponse();
+                Pageable pageable = PageRequest.of(0, 30);
+                List<Message> messageList = messageRepository.findAllByChatId(chat.getId(), pageable);
+                String userId = Objects.equals(chat.getParticipants().get(0).getUserId(), id)
+                        ? chat.getParticipants().get(0).getUserId()
+                        : chat.getParticipants().get(1).getUserId();
+                User user = userRepository.findUserById(userId);
+                chatProfileResponse.setProfileId(user.getId());
+                chatProfileResponse.setName(user.getName().isEmpty() ? user.getName() : "");
+                chatProfileResponse.setProfileImage(user.getProfilePhoto().isEmpty() ? user.getProfilePhoto() : "");
+                chatProfileResponse.setEmail(user.getEmail());
+                chatProfileResponse.setMessageList(messageList);
+                profileResponseList.add(chatProfileResponse);
+            }
+
+        }
+        response.setData(profileResponseList);
+        response.setMessage("Success");
+        response.setStatusCode(StatusCode.SUCCESS.getCode());
+        response.setSuccess(true);
         return response;
     }
 

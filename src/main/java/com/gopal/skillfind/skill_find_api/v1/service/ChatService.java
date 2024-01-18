@@ -101,7 +101,7 @@ public class ChatService {
             if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
                 User retriveUser = userRepository.findUserByToken(authorizationHeader);
                 if (retriveUser != null) {
-                    Pageable pageable = PageRequest.of(Integer.parseInt(page), 10);
+                    Pageable pageable = PageRequest.of(Integer.parseInt(page), 30);
                     List<Chat> dbChats = chatRepository.findAllByOrderByModifiedDateDesc(pageable);
                     response.setMessage("Chats data");
                     response.setSuccess(true);
