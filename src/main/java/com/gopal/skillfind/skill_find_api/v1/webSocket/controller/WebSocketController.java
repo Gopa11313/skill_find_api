@@ -130,8 +130,8 @@ public class WebSocketController {
                         : chat.getParticipants().get(1).getUserId();
                 User user = userRepository.findUserById(userId);
                 chatProfileResponse.setProfileId(user.getId());
-                chatProfileResponse.setName(user.getName().isEmpty() ? user.getName() : "");
-                chatProfileResponse.setProfileImage(user.getProfilePhoto().isEmpty() ? user.getProfilePhoto() : "");
+                chatProfileResponse.setName(user.getName().isEmpty() ? "" : user.getName());
+                chatProfileResponse.setProfileImage(user.getProfilePhoto().isEmpty() ? "" : user.getProfilePhoto());
                 chatProfileResponse.setEmail(user.getEmail());
                 chatProfileResponse.setMessageList(messageList);
                 profileResponseList.add(chatProfileResponse);
