@@ -115,7 +115,9 @@ public class WebSocketController {
     public Response subscribeToChatProfile(@DestinationVariable String id) {
         Response response = new Response();
         List<Chat> chats = chatRepository.findByParticipantsUserIdOrParticipantsUserId(id, id);
-
+        System.out.println("=================subscribeToChatProfile================");
+        System.out.println(chats);
+        System.out.println("=================================");
         List<ChatProfileResponse> profileResponseList = new ArrayList<>();
         if (chats != null) {
             for (Chat chat : chats) {
