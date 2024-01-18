@@ -110,21 +110,22 @@ public class WebSocketController {
         return response;
     }
 
-    @MessageMapping("/chat/profile/{id}/listen")
-    @SendTo("/topics/event/profile/{id}")
-    public Response subscribeToChatProfile(@DestinationVariable String id) {
+    @MessageMapping("/chat/profile/{receiverIDString}/listen")
+    @SendTo("/topics/event/profile/{receiverIDString}")
+    public Response subscribeToChatProfile(@DestinationVariable String receiverIDString) {
         Response response = new Response();
-        List<Chat> chats = chatRepository.findByParticipantsUserIdOrderByModifiedDateDesc(id);
+        List<Chat> chats = chatRepository.findByParticipantsUserIdOrderByModifiedDateDesc(receiverIDString);
         System.out.println("=================subscribeToChatProfile================");
         System.out.println(chats);
+        System.out.println(receiverIDString);
         System.out.println("=================================");
         List<ChatProfileResponse> profileResponseList = new ArrayList<>();
-        if (chats != null) {
+        if (!chats.isEmpty()) {
             for (Chat chat : chats) {
                 ChatProfileResponse chatProfileResponse = new ChatProfileResponse();
                 Pageable pageable = PageRequest.of(0, 30);
                 List<Message> messageList = messageRepository.findAllByChatId(chat.getId(), pageable);
-                String userId = Objects.equals(chat.getParticipants().get(0).getUserId(), id)
+                String userId = Objects.equals(chat.getParticipants().get(0).getUserId(), receiverIDString)
                         ? chat.getParticipants().get(0).getUserId()
                         : chat.getParticipants().get(1).getUserId();
                 User user = userRepository.findUserById(userId);
