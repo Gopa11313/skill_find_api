@@ -2,6 +2,7 @@ package com.gopal.skillfind.skill_find_api.v1.controller;
 
 import com.gopal.skillfind.skill_find_api.model.User;
 import com.gopal.skillfind.skill_find_api.utils.Response;
+import com.gopal.skillfind.skill_find_api.utils.SkillBody;
 import com.gopal.skillfind.skill_find_api.v1.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -45,5 +46,10 @@ public class UserController {
     @GetMapping("/getUserSkills")
     private Response getUSerSkills(@RequestHeader("Authorization") String authorizationHeader){
         return userService.getUserSkills(authorizationHeader);
+    }
+
+    @PostMapping("/updateUserSkills")
+    private Response updateUserSkills(@RequestHeader("Authorization") String authorizationHeader,@RequestBody SkillBody skillBody){
+        return userService.updateUserSkills(authorizationHeader,skillBody);
     }
 }

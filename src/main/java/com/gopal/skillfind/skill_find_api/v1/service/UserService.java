@@ -433,4 +433,56 @@ public class UserService {
         }
         return response;
     }
+
+    public Response updateUserSkills(String authorizationHeader, SkillBody skillBody) {
+        Response response = new Response();
+        try {
+            if (authorizationHeader != null || !authorizationHeader.isEmpty()) {
+                User retriveUser = userRepository.findUserByToken(authorizationHeader);
+                if (retriveUser != null) {
+                    if (skillBody.ids.size() > 0) {
+                        for (String i : skillBody.ids) {
+                            Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(i);
+                            if (!service.isPresent()) {
+                                skillBody.ids.remove(i);
+                            }
+                        }
+                        retriveUser.setSkills(skillBody.ids);
+                        userRepository.save(retriveUser);
+                        response.setMessage("Success");
+                        response.setSuccess(true);
+                        response.setData(null);
+                        response.setStatusCode(StatusCode.SUCCESS.getCode());
+                    } else {
+                        response.setMessage("Please send at least one skills");
+                        response.setSuccess(false);
+                        response.setData(null);
+                        response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+                    }
+                } else {
+                    response.setMessage("User doesn't exists.");
+                    response.setSuccess(false);
+                    response.setData(null);
+                    response.setStatusCode(StatusCode.NOT_FOUND.getCode());
+                }
+            } else {
+                response.setMessage("Missing Token");
+                response.setSuccess(false);
+                response.setData(null);
+                response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
+            }
+        } catch (Exception e) {
+            Log log = new Log();
+            log.setError(e.getMessage());
+            log.setSource("/api/skillFind/v1/user/updateUserSkills");
+            log.setTimeStamp(DateUtils.getCurrentDate());
+            logService.createLog(log);
+
+            response.setMessage("internal server error");
+            response.setSuccess(false);
+            response.setData(null);
+            response.setStatusCode(StatusCode.INTERNAL_SERVER_ERROR.getCode());
+        }
+        return response;
+    }
 }
