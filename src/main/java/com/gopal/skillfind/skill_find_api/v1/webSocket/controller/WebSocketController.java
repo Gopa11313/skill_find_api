@@ -57,13 +57,9 @@ public class WebSocketController {
     @MessageMapping("/chat/{senderIDString}/{receiverIDString}")
     @SendTo({"/topics/event/{senderIDString}/{receiverIDString}", "/topics/event/{receiverIDString}/{senderIDString}"})
     public Response getChatWithReceiverAndSender1(String content, @DestinationVariable String receiverIDString, @DestinationVariable String senderIDString) {
-        System.out.println("getChatWithReceiverAndSender1" + senderIDString);
         String senderID = senderIDString;
         String receiverID = receiverIDString;
         Response chat = chatService.createChatByID(senderID, receiverID, content);
-        System.out.println("=================getChatWithReceiverAndSender1====================");
-        System.out.println(chat.getData());
-        System.out.println("=====================================");
         Response response = new Response();
         if (!chat.getSuccess()) {
             return response;
@@ -75,9 +71,6 @@ public class WebSocketController {
         response.setMessage("Success");
         response.setSuccess(true);
         response.setStatusCode(StatusCode.SUCCESS.getCode());
-        System.out.println("=====================================");
-        System.out.println(response);
-        System.out.println("=====================================");
         subscribeToChatProfile(senderIDString);
         subscribeToChatProfile(receiverIDString);
         return response;
@@ -87,13 +80,9 @@ public class WebSocketController {
     @MessageMapping("/chat/{senderIDString}/{receiverIDString}/listen")
     @SendTo("/topics/event/{senderIDString}/{receiverIDString}")
     public Response subscribeToSenderReceiverChatList(@DestinationVariable String receiverIDString, @DestinationVariable String senderIDString) {
-        System.out.println("subscribeToSenderReceiverChatList" + senderIDString);
         String senderID = senderIDString;
         String receiverID = receiverIDString;
         Chat chat = chatRepository.findByParticipantsUserIdAndParticipantsUserId(senderID, receiverID);
-        System.out.println("===================subscribeToSenderReceiverChatList==================");
-        System.out.println(chat);
-        System.out.println("=====================================");
         Response response = new Response();
         if (chat == null) {
             return response;
@@ -104,9 +93,6 @@ public class WebSocketController {
         response.setMessage("Success");
         response.setSuccess(true);
         response.setStatusCode(StatusCode.SUCCESS.getCode());
-        System.out.println("=====================================");
-        System.out.println(response);
-        System.out.println("=====================================");
         return response;
     }
 
@@ -115,10 +101,6 @@ public class WebSocketController {
     public Response subscribeToChatProfile(@DestinationVariable String receiverIDString) {
         Response response = new Response();
         List<Chat> chats = chatRepository.findByParticipantsUserIdOrderByModifiedDateDesc(receiverIDString);
-        System.out.println("=================subscribeToChatProfile================");
-        System.out.println(chats);
-        System.out.println(receiverIDString);
-        System.out.println("=================================");
         List<ChatProfileResponse> profileResponseList = new ArrayList<>();
         if (!chats.isEmpty()) {
             for (Chat chat : chats) {

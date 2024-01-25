@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -157,6 +158,20 @@ public class UserUtils {
         } else {
             // fullPath doesn't start with basePath, return it as is
             return fullPath;
+        }
+    }
+    public static void deleteImage(String filePath) {
+        try {
+            // Convert the file path string to a Path object
+            Path path = Paths.get("/var/www/html"+filePath);
+
+            // Delete the file
+            Files.delete(path);
+
+            System.out.println("File deleted successfully: " + filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error deleting file: " + e.getMessage());
         }
     }
 }

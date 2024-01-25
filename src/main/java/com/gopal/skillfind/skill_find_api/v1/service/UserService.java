@@ -5,6 +5,7 @@ import com.gopal.skillfind.skill_find_api.model.Log;
 import com.gopal.skillfind.skill_find_api.model.User;
 import com.gopal.skillfind.skill_find_api.model.UserPreference;
 import com.gopal.skillfind.skill_find_api.model.respones.ModifiedUser;
+import com.gopal.skillfind.skill_find_api.model.respones.UserInfo;
 import com.gopal.skillfind.skill_find_api.repository.FavoriteRepository;
 import com.gopal.skillfind.skill_find_api.repository.ServiceRepository;
 import com.gopal.skillfind.skill_find_api.repository.UserPreferenceRepository;
@@ -238,28 +239,31 @@ public class UserService {
                         retriveUser.setBio(user.getBio());
                         retriveUser.setAccountType(AccountType.SUPERUSER);
                         if (user.getProfilePhoto() != null) {
+                            if (retriveUser.getProfilePhoto() != null) {
+                                UserUtils.deleteImage(retriveUser.getProfilePhoto());
+                            }
                             String imageUrl = UserUtils.convertAndSaveImage(user.getProfilePhoto(), "/var/www/html/storage/" + retriveUser.getId() + "/", retriveUser.getId());
                             retriveUser.setProfilePhoto(imageUrl);
                         }
                         if (user.getWorkImages().size() > 0) {
+                            if (retriveUser.getWorkImages().size() > 0) {
+                                for (String path : user.getWorkImages()) {
+                                    UserUtils.deleteImage(path);
+                                }
+                            }
                             List<String> savedImages = new ArrayList<>();
                             for (int i = 0; i < user.getWorkImages().size(); i++) {
                                 String imageUrl = UserUtils.convertAndSaveImage(user.getWorkImages().get(i), "/var/www/html/storage/" + retriveUser.getId() + "/", retriveUser.getId());
                                 savedImages.add(imageUrl);
                             }
                             retriveUser.setWorkImages(savedImages);
+
                         }
                         userRepository.save(retriveUser);
                         response.setMessage("Updated SuccessFully");
                         response.setSuccess(true);
                         response.setData(null);
                         response.setStatusCode(StatusCode.SUCCESS.getCode());
-//                        } else {
-//                            response.setMessage("Please enter valid number.");
-//                            response.setSuccess(false);
-//                            response.setData(null);
-//                            response.setStatusCode(StatusCode.BAD_REQUEST.getCode());
-//                        }
                     } else {
                         response.setMessage("Please provide all the required data");
                         response.setSuccess(false);
@@ -306,9 +310,31 @@ public class UserService {
                     retriveUser.setRefToken("");
                     retriveUser.setPassword("");
                     retriveUser.setCreatedTimeStamp("");
+
+                    UserInfo userInfo = new UserInfo();
+                    userInfo.setName(retriveUser.getName());
+                    userInfo.setEmail(retriveUser.getEmail());
+                    userInfo.setPhNo(retriveUser.getPhNo());
+                    userInfo.setLocation(retriveUser.getLocation());
+                    userInfo.setAccountType(retriveUser.getAccountType());
+                    userInfo.setLoginType(retriveUser.getLoginType());
+                    userInfo.setBio(retriveUser.getBio());
+                    userInfo.setProfilePhoto(retriveUser.getProfilePhoto());
+                    userInfo.setStartedWorkingYear(retriveUser.getStartedWorkingYear());
+                    userInfo.setWorkImages(retriveUser.getWorkImages());
+                    userInfo.setWorkPreference(retriveUser.getWorkPreference());
+                    List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = new ArrayList<>();
+                    for (String id : retriveUser.getSkills()) {
+                        Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(id);
+                        if (service.isPresent()) {
+                            serviceList.add(service.get());
+                        }
+                    }
+                    userInfo.setSkills(serviceList);
+
                     response.setMessage("Data");
                     response.setSuccess(true);
-                    response.setData(retriveUser);
+                    response.setData(userInfo);
                     response.setStatusCode(StatusCode.SUCCESS.getCode());
                 } else {
                     response.setMessage("UnAuthorized User");
@@ -350,12 +376,34 @@ public class UserService {
                         pageable = PageRequest.of(0, 20);
                     }
                     Page<User> usersPage = userRepository.findByAccountType("SUPERUSER", pageable);
-                    List<ModifiedUser> modifiedUsers = new ArrayList<>();
+                    List<UserInfo> modifiedUsers = new ArrayList<>();
                     if (usersPage.getContent().size() > 0) {
                         for (User user : usersPage.getContent()) {
                             Favorite favorite = favoriteRepository.findFavoriteByUserIdAndContentId(retriveUser.getId(), user.getId());
-                            ModifiedUser modifiedUser = new ModifiedUser(user.getId(), user.getName(), user.getEmail(), user.getPhNo(), user.getBio(), user.getLocation(), user.getSkills(), user.getProfilePhoto(), user.getDob(), user.getWorkImages(), user.getStartedWorkingYear(), user.getWorkPreference(), favorite != null);
-                            modifiedUsers.add(modifiedUser);
+                            UserInfo userInfo = new UserInfo();
+                            userInfo.setId(user.getId());
+                            userInfo.setName(user.getName());
+                            userInfo.setEmail(user.getEmail());
+                            userInfo.setPhNo(user.getPhNo());
+                            userInfo.setLocation(user.getLocation());
+                            userInfo.setAccountType(user.getAccountType());
+                            userInfo.setLoginType(user.getLoginType());
+                            userInfo.setBio(user.getBio());
+                            userInfo.setProfilePhoto(user.getProfilePhoto());
+                            userInfo.setStartedWorkingYear(user.getStartedWorkingYear());
+                            userInfo.setWorkImages(user.getWorkImages());
+                            userInfo.setWorkPreference(user.getWorkPreference());
+                            userInfo.setIsFavorite(favorite != null);
+                            List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = new ArrayList<>();
+                            for (String id : user.getSkills()) {
+                                Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(id);
+                                if (service.isPresent()) {
+                                    serviceList.add(service.get());
+                                }
+                            }
+                            userInfo.setSkills(serviceList);
+//                            ModifiedUser modifiedUser = new ModifiedUser(user.getId(), user.getName(), user.getEmail(), user.getPhNo(), user.getBio(), user.getLocation(), user.getSkills(), user.getProfilePhoto(), user.getDob(), user.getWorkImages(), user.getStartedWorkingYear(), user.getWorkPreference(), favorite != null);
+                            modifiedUsers.add(userInfo);
                         }
                     }
                     response.setMessage("Data");
