@@ -246,7 +246,7 @@ public class UserService {
                             retriveUser.setProfilePhoto(imageUrl);
                         }
                         if (user.getWorkImages().size() > 0) {
-                            if (retriveUser.getWorkImages().size() > 0) {
+                            if (retriveUser.getWorkImages() != null && retriveUser.getWorkImages().size() > 0) {
                                 for (String path : user.getWorkImages()) {
                                     UserUtils.deleteImage(path);
                                 }
@@ -324,7 +324,7 @@ public class UserService {
                     userInfo.setWorkImages(retriveUser.getWorkImages());
                     userInfo.setWorkPreference(retriveUser.getWorkPreference());
                     List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = new ArrayList<>();
-                    if (retriveUser.getSkills().size() > 0) {
+                    if (retriveUser.getSkills() != null && retriveUser.getSkills().size() > 0) {
                         for (String id : retriveUser.getSkills()) {
                             Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(id);
                             if (service.isPresent()) {
@@ -397,10 +397,12 @@ public class UserService {
                             userInfo.setWorkPreference(user.getWorkPreference());
                             userInfo.setIsFavorite(favorite != null);
                             List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = new ArrayList<>();
-                            for (String id : user.getSkills()) {
-                                Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(id);
-                                if (service.isPresent()) {
-                                    serviceList.add(service.get());
+                            if (user.getSkills() != null && user.getSkills().size() > 0) {
+                                for (String id : user.getSkills()) {
+                                    Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(id);
+                                    if (service.isPresent()) {
+                                        serviceList.add(service.get());
+                                    }
                                 }
                             }
                             userInfo.setSkills(serviceList);
