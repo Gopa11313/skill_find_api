@@ -324,10 +324,12 @@ public class UserService {
                     userInfo.setWorkImages(retriveUser.getWorkImages());
                     userInfo.setWorkPreference(retriveUser.getWorkPreference());
                     List<com.gopal.skillfind.skill_find_api.model.Service> serviceList = new ArrayList<>();
-                    for (String id : retriveUser.getSkills()) {
-                        Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(id);
-                        if (service.isPresent()) {
-                            serviceList.add(service.get());
+                    if (retriveUser.getSkills().size() > 0) {
+                        for (String id : retriveUser.getSkills()) {
+                            Optional<com.gopal.skillfind.skill_find_api.model.Service> service = serviceRepository.findById(id);
+                            if (service.isPresent()) {
+                                serviceList.add(service.get());
+                            }
                         }
                     }
                     userInfo.setSkills(serviceList);
