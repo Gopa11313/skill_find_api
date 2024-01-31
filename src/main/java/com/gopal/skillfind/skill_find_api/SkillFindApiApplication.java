@@ -55,7 +55,9 @@ public class SkillFindApiApplication {
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/chat/createChat").permitAll()
                     .antMatchers(HttpMethod.GET, "/api/skillFind/v1/chat/getChat/{page}").permitAll()
 
-
+                    //device
+                    .antMatchers(HttpMethod.POST, "/api/skillFind/v1/device/registerDevice").permitAll()
+                    
                     //admin
                     .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/createAdminUser").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/adminLogin").permitAll()
@@ -64,6 +66,8 @@ public class SkillFindApiApplication {
                     .antMatchers(HttpMethod.POST, "/api/skillFind/service/createService").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/skillFind/service/getServices").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/skillFind/service/deleteService").permitAll()
+
+
 
                     .antMatchers("/my-ws", "/my-ws/**").permitAll() // Adjust this based on your security needs
                     .anyRequest().authenticated();

@@ -319,6 +319,7 @@ public class UserService {
                     userInfo.setAccountType(retriveUser.getAccountType());
                     userInfo.setLoginType(retriveUser.getLoginType());
                     userInfo.setBio(retriveUser.getBio());
+                    userInfo.setDob(retriveUser.getDob());
                     userInfo.setProfilePhoto(retriveUser.getProfilePhoto());
                     userInfo.setStartedWorkingYear(retriveUser.getStartedWorkingYear());
                     userInfo.setWorkImages(retriveUser.getWorkImages());
@@ -390,6 +391,7 @@ public class UserService {
                             userInfo.setLocation(user.getLocation());
                             userInfo.setAccountType(user.getAccountType());
                             userInfo.setLoginType(user.getLoginType());
+                            userInfo.setDob(user.getDob());
                             userInfo.setBio(user.getBio());
                             userInfo.setProfilePhoto(user.getProfilePhoto());
                             userInfo.setStartedWorkingYear(user.getStartedWorkingYear());
