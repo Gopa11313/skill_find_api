@@ -20,7 +20,7 @@ public class SearchController {
     }
 
     @PostMapping("/createSearch")
-    public Response createSearch(@RequestHeader("Authorization") String header, Search search) {
+    public Response createSearch(@RequestHeader("Authorization") String header,@RequestBody  Search search) {
         return searchService.createSearch(header,search);
     }
 }

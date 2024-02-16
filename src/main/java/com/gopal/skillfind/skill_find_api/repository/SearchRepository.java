@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface SearchRepository extends MongoRepository<Search, String> {
-    List<Search> findAllByUserIDAndOrderByTimeDesc(String userId,
-                                                   Pageable pageable);
+//    List<Search> findAllByUserIdAndOrderByTimeDesc(String userId,
+//                                                   Pageable pageable);
 }

@@ -1,11 +1,11 @@
 package com.gopal.skillfind.skill_find_api.v1.service;
 
 import com.gopal.skillfind.skill_find_api.model.Log;
+import com.gopal.skillfind.skill_find_api.model.Post;
 import com.gopal.skillfind.skill_find_api.model.Search;
 import com.gopal.skillfind.skill_find_api.model.User;
-import com.gopal.skillfind.skill_find_api.repository.LogRepository;
-import com.gopal.skillfind.skill_find_api.repository.SearchRepository;
-import com.gopal.skillfind.skill_find_api.repository.UserRepository;
+import com.gopal.skillfind.skill_find_api.model.respones.SearchResponse;
+import com.gopal.skillfind.skill_find_api.repository.*;
 import com.gopal.skillfind.skill_find_api.utils.DateUtils;
 import com.gopal.skillfind.skill_find_api.utils.Response;
 import com.gopal.skillfind.skill_find_api.utils.StatusCode;
@@ -28,6 +28,13 @@ public class SearchService {
     @Autowired
     private LogService logService;
 
+    @Autowired
+    private ServiceRepository serviceRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
+
     public Response getRecentSearches(String header) {
         Response response = new Response();
         try {
@@ -35,11 +42,11 @@ public class SearchService {
                 User retriveUser = userRepository.findUserByToken(header);
                 if (retriveUser != null) {
                     Pageable pageable = PageRequest.of(0, 10);
-                    List<Search> savedSearches = searchRepository.findAllByUserIDAndOrderByTimeDesc(retriveUser.getId(), pageable);
-                    response.setMessage("Success");
-                    response.setSuccess(true);
-                    response.setData(savedSearches);
-                    response.setStatusCode(StatusCode.SUCCESS.getCode());
+//                    List<Search> savedSearches = searchRepository.findAllByUserIdAndOrderByTimeDesc(retriveUser.getId(), pageable);
+//                    response.setMessage("Success");
+//                    response.setSuccess(true);
+//                    response.setData(savedSearches);
+//                    response.setStatusCode(StatusCode.SUCCESS.getCode());
                 } else {
                     response.setMessage("UnAuthorized User");
                     response.setSuccess(false);
@@ -74,7 +81,22 @@ public class SearchService {
             if (header != null && !header.isEmpty()) {
                 User retriveUser = userRepository.findUserByToken(header);
                 if (retriveUser != null) {
-
+                    List<com.gopal.skillfind.skill_find_api.model.Service> listOfService = serviceRepository.findByNameRegexAndIsActiveTrue(search.getSearch());
+                    List<Post> postList = postRepository.findByTitleOrDescriptionRegex(search.getSearch());
+                    SearchResponse searchResponse = new SearchResponse();
+                    searchResponse.setSearch(listOfService);
+                    searchResponse.setPosts(postList);
+////                    search.setUserId(retriveUser.getId());
+//
+                    response.setMessage("Success");
+                    response.setSuccess(true);
+                    response.setData(searchResponse);
+                    response.setStatusCode(StatusCode.SUCCESS.getCode());
+                } else {
+                    response.setMessage("UnAuthorized User");
+                    response.setSuccess(false);
+                    response.setData(null);
+                    response.setStatusCode(StatusCode.UNAUTHORIZED.getCode());
                 }
             } else {
                 response.setMessage("Missing Token");

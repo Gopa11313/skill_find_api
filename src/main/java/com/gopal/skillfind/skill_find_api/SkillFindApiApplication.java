@@ -4,6 +4,7 @@ import com.gopal.skillfind.skill_find_api.utils.JWTAuthorizationFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -57,7 +58,7 @@ public class SkillFindApiApplication {
 
                     //device
                     .antMatchers(HttpMethod.POST, "/api/skillFind/v1/device/registerDevice").permitAll()
-                    
+
                     //admin
                     .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/createAdminUser").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/skillFind/adminUser/adminLogin").permitAll()
@@ -68,12 +69,15 @@ public class SkillFindApiApplication {
                     .antMatchers(HttpMethod.POST, "/api/skillFind/service/deleteService").permitAll()
 
 
+                    //search
+                    .antMatchers(HttpMethod.POST, "/api/skillFind/v1/search/createSearch").permitAll()
 
                     .antMatchers("/my-ws", "/my-ws/**").permitAll() // Adjust this based on your security needs
                     .anyRequest().authenticated();
 
 
         }
+
     }
 
 }
